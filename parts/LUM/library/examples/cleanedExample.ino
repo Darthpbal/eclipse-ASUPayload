@@ -60,115 +60,71 @@
 
 
 
-/* SparkFun TSL2561 library example sketch
 
-This sketch shows how to use the SparkFunTSL2561
-library to read the AMS/TAOS TSL2561
-light sensor.
-
-Product page: https://www.sparkfun.com/products/11824
-Hook-up guide: https://learn.sparkfun.com/tutorials/tsl2561-luminosity-sensor-hookup-guide?_ga=1.78161940.1469174492.1484914299
-
-Hardware connections:
-
-3V3 to 3.3V
-GND to GND
-
-(WARNING: do not connect 3V3 to 5V
-or the sensor will be damaged!)
-
-You will also need to connect the I2C pins (SCL and SDA) to your Arduino.
-The pins are different on different Arduinos:
-
-                    SDA    SCL
-Any Arduino         "SDA"  "SCL"
-Uno, Redboard, Pro  A4     A5
-Mega2560, Due       20     21
-Leonardo            2      3
-
-You do not need to connect the INT (interrupt) pin
-for basic operation.
-
-Operation:
-
-Upload this sketch to your Arduino, and open the
-Serial Monitor window to 9600 baud.
-
-Have fun! -Your friends at SparkFun.
-
-Our example code uses the "beerware" license.
-You can do anything you like with this code.
-No really, anything. If you find it useful,
-buy me a beer someday.
-
-V10 Mike Grusin, SparkFun Electronics 12/26/2013
-Updated to Arduino 1.6.4 5/2015
+/*testing while at asu noble library covering and uncovering the sensor
+question: This sensor is a combo visible and UV sensor, and I believe
+that is what the two "data" values are. The question is which one is which?
+Maybe data0 is visible (because higher value) and data1 is UV?
+data0: 1588 data1: 270 lux: 640.55 (good)
+data0: 1589 data1: 270 lux: 641.07 (good)
+data0: 1587 data1: 270 lux: 640.03 (good)
+data0: 1587 data1: 270 lux: 640.03 (good)
+data0: 634 data1: 115 lux: 250.75 (good)
+data0: 98 data1: 25 lux: 33.31 (good)
+data0: 69 data1: 17 lux: 23.93 (good)
+data0: 54 data1: 14 lux: 18.17 (good)
+data0: 48 data1: 12 lux: 16.51 (good)
+data0: 45 data1: 11 lux: 15.68 (good)
+data0: 44 data1: 11 lux: 15.13 (good)
+data0: 43 data1: 11 lux: 14.59 (good)
+data0: 721 data1: 127 lux: 287.79 (good)
+data0: 1587 data1: 269 lux: 640.72 (good)
+data0: 1594 data1: 271 lux: 642.99 (good)
+data0: 1590 data1: 271 lux: 640.91 (good)
+data0: 1583 data1: 270 lux: 637.95 (good)
+data0: 1584 data1: 270 lux: 638.47 (good)
+data0: 1582 data1: 269 lux: 638.12 (good)
+data0: 1584 data1: 270 lux: 638.47 (good)
+data0: 1471 data1: 248 lux: 594.80 (good)
+data0: 247 data1: 50 lux: 93.96 (good)
+data0: 65 data1: 16 lux: 22.56 (good)
+data0: 52 data1: 13 lux: 17.89 (good)
+data0: 54 data1: 13 lux: 18.97 (good)
+data0: 53 data1: 13 lux: 18.43 (good)
+data0: 53 data1: 13 lux: 18.43 (good)
+data0: 53 data1: 13 lux: 18.43 (good)
+data0: 50 data1: 12 lux: 17.59 (good)
+data0: 958 data1: 165 lux: 384.98 (good)
+data0: 1596 data1: 271 lux: 644.03 (good)
+data0: 1595 data1: 271 lux: 643.51 (good)
 */
 
-// Your sketch must #include this library, and the Wire library
-// (Wire is a standard library included with Arduino):
+
+
+
+
+
+
+
+
+
 
 #include <SparkFunTSL2561.h>
 #include <Wire.h>
 
-// Create an SFE_TSL2561 object, here called "light":
 
 SFE_TSL2561 light;
 
-// Global variables:
 
-boolean gain;     // Gain setting, 0 = X1, 1 = X16;
-unsigned int ms;  // Integration ("shutter") time in milliseconds
+boolean gain;
+unsigned int ms;
 
 void setup()
 {
-  // Initialize the Serial port:
 
   Serial.begin(9600);
-  Serial.println("TSL2561 example sketch");
-
-  // Initialize the SFE_TSL2561 library
-
-  // You can pass nothing to light.begin() for the default I2C address (0x39),
-  // or use one of the following presets if you have changed
-  // the ADDR jumper on the board:
-
-  // TSL2561_ADDR_0 address with '0' shorted on board (0x29)
-  // TSL2561_ADDR   default address (0x39)
-  // TSL2561_ADDR_1 address with '1' shorted on board (0x49)
-
-  // For more information see the hookup guide at: https://learn.sparkfun.com/tutorials/getting-started-with-the-tsl2561-luminosity-sensor
 
   light.begin();
-
-  // Get factory ID from sensor:
-  // (Just for fun, you don't need to do this to operate the sensor)
-
-  unsigned char ID;
-
-  if (light.getID(ID))
-  {
-    Serial.print("Got factory ID: 0X");
-    Serial.print(ID,HEX);
-    Serial.println(", should be 0X5X");
-  }
-  // Most library commands will return true if communications was successful,
-  // and false if there was a problem. You can ignore this returned value,
-  // or check whether a command worked correctly and retrieve an error code:
-  else
-  {
-    byte error = light.getError();
-    printError(error);
-  }
-
-  // The light sensor has a default integration time of 402ms,
-  // and a default gain of low (1X).
-
-  // If you would like to change either of these, you can
-  // do so using the setTiming() command.
-
-  // If gain = false (0), device is set to low gain (1X)
-  // If gain = high (1), device is set to high gain (16X)
 
   gain = 0;
 
@@ -176,18 +132,15 @@ void setup()
   // If time = 1, integration will be 101ms
   // If time = 2, integration will be 402ms
   // If time = 3, use manual start / stop to perform your own integration
-
   unsigned char time = 2;
 
   // setTiming() will set the third parameter (ms) to the
   // requested integration time in ms (this will be useful later):
 
-  Serial.println("Set timing...");
   light.setTiming(gain,time,ms);
 
   // To start taking measurements, power up the sensor:
 
-  Serial.println("Powerup...");
   light.setPowerUp();
 
   // The sensor will now gather light during the integration time.
