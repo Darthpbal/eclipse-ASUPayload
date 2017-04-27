@@ -182,6 +182,23 @@ boolean SFE_TSL2561::getData(unsigned int &data0, unsigned int &data1)
 
 	return(false);
 }
+boolean SFE_TSL2561::getData(volatile unsigned int &vdata0, volatile unsigned int &vdata1)//I wanna use this function inside the ISR, that's why i'm overloading this funciton with volatile arguments.
+	// Retrieve raw integration results
+	// data0 and data1 will be set to integration results
+	// Returns true (1) if successful, false (0) if there was an I2C error
+	// (Also see getError() below)
+{
+	// Get data0 and data1 out of result registers
+	unsigned int data0, data1;
+	if (readUInt(TSL2561_REG_DATA_0,data0) && readUInt(TSL2561_REG_DATA_1,data1)){
+		vdata0 = data0;
+		vdata1 = data1;
+		return(true);
+	}
+	vdata0 = data0;
+	vdata1 = data1;
+	return(false);
+}
 
 
 boolean SFE_TSL2561::getLux(unsigned char gain, unsigned int ms, unsigned int CH0, unsigned int CH1, double &lux)

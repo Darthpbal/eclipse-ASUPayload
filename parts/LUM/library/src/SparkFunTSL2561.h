@@ -1,10 +1,10 @@
 /*
 	SFE_TSL2561 illumination sensor library for Arduino
 	Mike Grusin, SparkFun Electronics
-	
+
 	This library provides functions to access the TAOS TSL2561
 	Illumination Sensor.
-	
+
 	Our example code uses the "beerware" license. You can do anything
 	you like with this code. No really, anything. If you find it useful,
 	buy me a beer someday.
@@ -23,7 +23,7 @@ class SFE_TSL2561
 	public:
 		SFE_TSL2561(void);
 			// SFE_TSL2561 object
-			
+
 		boolean begin(void);
 			// Initialize TSL2561 library with default address (0x39)
 			// Always returns true
@@ -34,7 +34,7 @@ class SFE_TSL2561
 			// TSL2561_ADDR   (0x39 default address)
 			// TSL2561_ADDR_1 (0x49 address with '1' shorted on board)
 			// Always returns true
-		
+
 		boolean setPowerUp(void);
 			// Turn on TSL2561, begin integration
 			// Returns true (1) if successful, false (0) if there was an I2C error
@@ -80,11 +80,12 @@ class SFE_TSL2561
 			// (Also see getError() below)
 
 		boolean getData(unsigned int &CH0, unsigned int &CH1);
+		boolean getData(volatile unsigned int &CH0, volatile unsigned int &CH1);
 			// Retrieve raw integration results
 			// data0 and data1 will be set to integration results
 			// Returns true (1) if successful, false (0) if there was an I2C error
 			// (Also see getError() below)
-			
+
 		boolean getLux(unsigned char gain, unsigned int ms, unsigned int CH0, unsigned int CH1, double &lux);
 			// Convert raw data to lux
 			// gain: 0 (1X) or 1 (16X), see setTiming()
@@ -120,10 +121,10 @@ class SFE_TSL2561
 			// Sets ID to part ID (see datasheet)
 			// Returns true (1) if successful, false (0) if there was an I2C error
 			// (Also see getError() below)
-			
+
 		byte getError(void);
 			// If any library command fails, you can retrieve an extended
-			// error code using this command. Errors are from the wire library: 
+			// error code using this command. Errors are from the wire library:
 			// 0 = Success
 			// 1 = Data too long to fit in transmit buffer
 			// 2 = Received NACK on transmit of address
@@ -138,7 +139,7 @@ class SFE_TSL2561
 			// Value will be set to stored byte
 			// Returns true (1) if successful, false (0) if there was an I2C error
 			// (Also see getError() above)
-	
+
 		boolean writeByte(unsigned char address, unsigned char value);
 			// Write a byte to a TSL2561 address
 			// Address: TSL2561 address (0 to 15)
@@ -159,7 +160,7 @@ class SFE_TSL2561
 			// Value: unsigned int to write to address
 			// Returns true (1) if successful, false (0) if there was an I2C error
 			// (Also see getError() above)
-			
+
 		char _i2c_address;
 		byte _error;
 };
