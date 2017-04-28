@@ -13,6 +13,9 @@ and want to see multiple flags for each interval, which should be ~6 or 7 counts
 per 2.5 second windows for a 402ms light integration time.
 
 This is built off of the Sparkfun TSL2561 luminosity sensor and the library that comes with it.
+
+channel 0 is visible spectrum
+channel 1 is ir spectrum
 */
 
 #include <SparkFunTSL2561.h>
@@ -257,4 +260,32 @@ channel 1	channel2	countPerWindow
 163           101           17
 
 
+
+
+normal method, but using arbitrary delay instead of the integration time
+and alternating between uncovered and covered
+5.0 second data window started...
+channel 1	channel2
+data0: 162 data1: 100 lux: 8.70 (good)
+data0: 22 data1: 17 lux: 0.34 (good)
+data0: 162 data1: 100 lux: 8.70 (good)
+data0: 23 data1: 18 lux: 0.30 (good)
+data0: 161 data1: 99 lux: 8.74 (good)
+data0: 26 data1: 19 lux: 0.67 (good)
+data0: 162 data1: 100 lux: 8.70 (good)
+
+
+
+interrupt method alternating between covered and uncovered
+5.0 second data window started... Predicted count for current window is 12 or 13
+channel 1	channel2	countPerWindow
+163           100           13
+25            19            13
+163           100           13
+27            20            12
+163           100           13
+26            20            12
+163           100           13
+27            20            13
+163           100           12
 */
