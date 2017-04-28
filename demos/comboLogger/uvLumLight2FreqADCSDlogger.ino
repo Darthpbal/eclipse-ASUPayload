@@ -132,14 +132,9 @@ void loop() {
     tempPulseCount = livePulseCount;
     hz = tempPulseCount - oldPulseCount; // peak count between time stamps
     hz *= (1000 / deltaTime); //convert from milliseconds to seconds and divide by delta time.
-    // Serial.print("FREQ: ");
-    // Serial.print(hz);
     logLine += hz;
     logLine += ',';
-    // Serial.print("\t = ");
-    // Serial.print((hz+50)/100);  // +50 == rounding last digit
     logLine += (hz+50) / 100;  // +50 == rounding last digit
-    // Serial.print(" mW/m2\t");
     logLine += ',';
     oldPulseCount = tempPulseCount;
     lastSampleTime = millis();
