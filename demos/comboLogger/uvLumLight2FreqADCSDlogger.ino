@@ -6,9 +6,7 @@
 
 #include <Adafruit_ADS1015.h>
 
-const boolean debugMode = false;
-
-Adafruit_ADS1015 adc11Bit;
+const boolean debugMode = false; //determines whether or not serial prints are used for the main portion of the program
 
 
 //uSD globals
@@ -38,6 +36,7 @@ unsigned long lastSampleTime;
 
 
 //adc
+Adafruit_ADS1015 adc11Bit;
 int chanPotLeft = 0,
     chanPotRight = 1,
     chanDiffLeft2Right = 1;
@@ -127,31 +126,7 @@ void loop() {
     //end LUM
 
 
-    // //This may need to be changed to be able to update a live value every sample interval
-    // //light to freq
-    // if(millis() - lastSampleTime >= 1000){
-    //     lastSampleTime = millis();
-    //     tempPulseCount = livePulseCount;
-    //     hz = tempPulseCount - oldPulseCount;
-    //     // Serial.print("FREQ: ");
-    //     // Serial.print(hz);
-    //     logLine += hz;
-    //     logLine += ',';
-    //     // Serial.print("\t = ");
-    //     // Serial.print((hz+50)/100);  // +50 == rounding last digit
-    //     logLine += (hz+50) / 100;  // +50 == rounding last digit
-    //     // Serial.print(" mW/m2\t");
-    //     logLine += "mW/m2,";
-    //     oldPulseCount = tempPulseCount;
-    // }
-    // else {//log last updated values
-    //     logLine += hz;
-    //     logLine += ',';
-    //     logLine += (hz+50) / 100;  // +50 == rounding last digit
-    //     logLine += "mW/m2,";
-    // }
-    // //end light to freq
-    //This may need to be changed to be able to update a live value every sample interval
+    // this algorithm has been changed from it's original form, but the values appear to be pretty similar. I'd like to test to make sure these values are accurate.
     //light to freq
     unsigned long deltaTime = millis() - lastSampleTime;
     tempPulseCount = livePulseCount;
@@ -187,7 +162,7 @@ void loop() {
     else lineLogger(logLine);
 
 
-    delay(150);
+    delay(150);     //for sanity
 
 
 }
@@ -196,7 +171,7 @@ void loop() {
 
 
 
-
+// counts the number of pulses seen from the light to frequency converter.
 void frequencyPulseCount(){
     livePulseCount++;
 }
@@ -331,7 +306,7 @@ float getVoltageWGain(int channel, adsGain_t gain, bool single0_diff1){
 
 /*
 ***  RESULTS  ***
-text captured from the serial monitor.
+text captured from the serial monitor:
 
 Initializing SD card...No card detected. Waiting for card.
 Initialization done.
@@ -349,7 +324,8 @@ Initializing SD card...No card detected. Waiting for card.
 
 
 
-contents of the resulting logfile.
+contents of the resulting logfile:
+
 lumVisRaw,lumIrRaw,lumLvl,lumSat,freq,mW/m2,adc0PotLeft,adc1PotRight,diffLeft2Right
 127,83,5.69,1,0,0mW/m2,1.47,1.66,-0.19,8792
 107,72,4.29,1,6515,65mW/m2,1.52,1.71,-0.19,8967
