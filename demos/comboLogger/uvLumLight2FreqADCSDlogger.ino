@@ -1,3 +1,14 @@
+/*
+Todo:
+    1. Make a scaling function to scale the values of the sensors to a common
+        scale so that plot is actually useful instead of only seeing the largest
+        value only.
+    2.Make the file logging algorithm create a new file upon removal and
+        reinssertion. This is preferable since many events could have happened
+        between the points in time the sd card is inserted. So the timestamps
+        aren't continuous.
+*/
+
 #include <SparkFunTSL2561.h>
 #include <Wire.h>
 
@@ -6,7 +17,10 @@
 
 #include <Adafruit_ADS1015.h>
 
-const boolean debugMode = false; //determines whether or not serial prints are used for the main portion of the program
+
+//determines how printing is handled for launch debug and graphing contexts
+enum configuration { launch, debug, plot };
+const configuration mode = launch;
 
 
 //uSD globals
@@ -45,7 +59,10 @@ int chanPotLeft = 0,
 
 void setup() {
     Serial.begin(9600);
-
+    Serial.print("mode = ");
+    if(mode == launch) Serial.println("launch");
+    else if(mode == debug) Serial.println("debug");
+    else if(mode == plot) Serial.println("plot");
 
     //light to freq
     pinMode(light2FreqPin, INPUT);
@@ -57,7 +74,7 @@ void setup() {
     //uSd Card
     while (!Serial);  // Wait for serial port to connect (ATmega32U4 type PCBAs)
     pinMode(cardDetect, INPUT);
-    initializeCard();
+    if(mode == launch) initializeCard();
     //end uSd Card
 
 
@@ -83,19 +100,15 @@ void setup() {
     diffLeft2Right: = analog to digital converter board differential between left and right potentiometer voltages.
     */
     String header = "lumVisRaw,lumIrRaw,lumLvl,lumSat,lightfreq,lightFreqmW/m2,adc0PotLeft,adc1PotRight,diffLeft2Right,millis\n";
-    if(debugMode) Serial.print(header);
-    else lineLogger(header);
+    if(mode  == debug) Serial.print(header);
+    else if(mode == launch) lineLogger(header);
 }
 
 
 
 void loop() {
-
-
     //SD card detection/reinitialization
-    if(debugMode){
-    }
-    else {
+    if(mode == launch){
         if (!digitalRead(cardDetect)){
             initializeCard();
         }
@@ -103,25 +116,28 @@ void loop() {
     //end SD card detection/reinitialization
 
 
-    String logLine = "";
+    String logLine = "";        //create a sentence string for logging
 
 
     //LUM
     unsigned int chanVisRaw, chanIrRaw;
     if(light.getData(chanVisRaw, chanIrRaw)){
         logLine += chanVisRaw;
-        logLine += ',';
+        logLine += (mode == launch)? ',': '\t';
         logLine += chanIrRaw;
-        logLine += ',';
+        logLine += (mode == launch)? ',': '\t';
         double lux;
         boolean goodLuxVal = light.getLux(gain, ms, chanVisRaw, chanIrRaw, lux);
         logLine += lux;
-        logLine += ',';
+        logLine += (mode == launch)? ',': '\t';
         logLine += goodLuxVal;
-        logLine += ',';
+        logLine += (mode == launch)? ',': '\t';
     }
     else {
-        logLine += "lumI2C error,,,,";
+        logLine += "lumI2C error";
+        for(int i = 0; i < 4; i++){
+            logLine += (mode == launch)? ',': ' ';
+        }
     }
     //end LUM
 
@@ -133,9 +149,9 @@ void loop() {
     hz = tempPulseCount - oldPulseCount; // peak count between time stamps
     hz *= (1000 / deltaTime); //convert from milliseconds to seconds and divide by delta time.
     logLine += hz;
-    logLine += ',';
+    logLine += (mode == launch)? ',': '\t';
     logLine += (hz+50) / 100;  // +50 == rounding last digit
-    logLine += ',';
+    logLine += (mode == launch)? ',': '\t';
     oldPulseCount = tempPulseCount;
     lastSampleTime = millis();
     //end light to freq
@@ -143,26 +159,29 @@ void loop() {
 
     //ADC
     logLine += getVoltageWGain(chanPotLeft, GAIN_ONE, 0);
-    logLine += ',';
+    logLine += (mode == launch)? ',': '\t';
     logLine += getVoltageWGain(chanPotRight, GAIN_ONE, 0);
-    logLine += ',';
+    logLine += (mode == launch)? ',': '\t';
     logLine += getVoltageWGain(chanDiffLeft2Right, GAIN_ONE, 1);
-    logLine += ',';
+    logLine += (mode == launch)? ',': '\t';
     //end ADC
 
-    logLine += millis();    // timestamp
+
+    if(mode != plot){
+        logLine += millis();    // timestamp
+    }
+
+
     logLine += '\n';    // last character should be a newline
 
-    if(debugMode) Serial.print(logLine);
-    else lineLogger(logLine);
 
+    if(mode == debug) Serial.print(logLine);
+    else if(mode == plot) Serial.print(logLine);
+    else if(mode == launch) lineLogger(logLine);
 
     delay(150);     //for sanity
 
-
 }
-
-
 
 
 
@@ -170,8 +189,6 @@ void loop() {
 void frequencyPulseCount(){
     livePulseCount++;
 }
-
-
 
 
 
@@ -213,7 +230,6 @@ void initializeCard(void){
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Write the buffer to the log file. If we are possibly in the EOF state, verify
 // that to make sure the command isn't written to the file.
@@ -226,9 +242,6 @@ void lineLogger(String line){
         logFile.close();
     }
 }
-
-
-
 
 
 
