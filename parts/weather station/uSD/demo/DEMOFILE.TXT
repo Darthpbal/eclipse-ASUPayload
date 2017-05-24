@@ -1,6 +1,0 @@
-this is a test of the micro sd logging board
-I wonder if the only newline characters that will exist are the ones
-from me pressing the enter key. 
-will there be newlines at the end of the 20 char buffer empty?
-eof
-
