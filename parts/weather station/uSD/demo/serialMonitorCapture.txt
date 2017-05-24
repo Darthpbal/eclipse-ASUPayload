@@ -1,0 +1,18 @@
+Initializing SD card...No card detected. Waiting for card.
+Initialization done.
+demoFile.txt doesn't exist. Creating.
+Opening file: demoFile.txt
+Enter text to be written to file. 'EOF' will terminate writing.
+this is a test of the micro sd logging board
+I wonder if the only newline characters that will exist are the ones
+from me pressing the enter key.
+will there be newlines at the end of the 20 char buffer empty?
+eof
+EOF
+
+demoFile.txt:
+this is a test of the micro sd logging board
+I wonder if the only newline characters that will exist are the ones
+from me pressing the enter key.
+will there be newlines at the end of the 20 char buffer empty?
+eof
