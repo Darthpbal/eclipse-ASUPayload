@@ -50,7 +50,7 @@ Where:
 #include <Wire.h>               //I2C class
 #include <SPI.h>                //SPI class
 #include <SD.h>                 //sd card file access class
-#include <Adafruit_ADS1015.h>   //12 bit adc class
+#include "Adafruit_ADS1015.h"   //12 bit adc class
 
 
 ////////////////////////////////////////////////////////////////////////////////
