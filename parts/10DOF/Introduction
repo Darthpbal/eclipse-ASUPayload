@@ -9,3 +9,19 @@ This board had 3 different sensors on it:
 
 Link to Introduction:
 https://learn.adafruit.com/adafruit-10-dof-imu-breakout-lsm303-l3gd20-bmp180/introduction
+download libraries on introduction page
+
+then visit 
+https://learn.adafruit.com/ahrs-for-adafruits-9-dof-10-dof-breakout/software
+to download adafruit library 10d0f package
+
+then visit
+https://learn.adafruit.com/ahrs-for-adafruits-9-dof-10-dof-breakout/magnetometer-calibration
+to calibrate sensor
+
+then download "test code" from this github
+enter in your calibrated values
+
+to interpret data visit 
+https://learn.adafruit.com/ahrs-for-adafruits-9-dof-10-dof-breakout/using-adafruit-ahrs
+the test code provides timestamp, orientation(heading, pitch, roll), altitude, temperature in that order
