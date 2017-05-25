@@ -50,7 +50,6 @@ Where:
 #include <Wire.h>               //I2C class
 #include <SPI.h>                //SPI class
 #include <SD.h>                 //sd card file access class
-#include <Adafruit_ADS1015.h>   //12 bit adc class
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,10 +83,6 @@ bool alreadyBegan = false;  // SD.begin() misbehaves if not first call
 //end uSD globals
 
 
-//adc
-Adafruit_ADS1015 adc12Bit;
-// int channelName = 0;  //uncomment this when adding analog channels to read.
-//end adc
 
 ////////////////////////////////////////////////////////////////////////////////
 //             End of global variables
@@ -275,66 +270,6 @@ void lineLogger(String line){
 
 
 
-
-/*
-Arguments:
-channel: choose the channel number, 0-3 in single ended, and 0-1 in differential
-gain: determines how to interpret the channel argument and chooose between using
-    single ended or differential class funtions and which appropriate one to use.
-    Also chooses the appropriate multiplier for conversion from an ADC value to
-    voltage.
-single0_diff1: Boolean value for choosing between measuring a single ended signal
-    and a differential signal. Choose 0 for single ended and 1 for differential.
-                Single ended: channels directly correspond to actual ADC channels
-                differential: channel 0 is differential between 0-1, and 1 is between 2-3
-
-GAIN_TWOTHIRDS   2/3x gain +/- 6.144V  1 bit = 3mV    (default)
-GAIN_ONE         1x gain   +/- 4.096V  1 bit = 2mV
-GAIN_TWO         2x gain   +/- 2.048V  1 bit = 1mV
-GAIN_FOUR        4x gain   +/- 1.024V  1 bit = 0.5mV
-GAIN_EIGHT       8x gain   +/- 0.512V  1 bit = 0.25mV
-GAIN_SIXTEEN     16x gain  +/- 0.256V  1 bit = 0.125mV
-*/
-float getVoltageWGain(int channel, adsGain_t gain, bool single0_diff1){
-    int16_t adcVal = 0;
-
-    adc12Bit.setGain(gain);
-
-    //read from the desired channel in single ended or differential
-    //differential 0-1 is channel 0 and differential 2-3 is channel 1
-    if(!single0_diff1){
-        adcVal = adc12Bit.readADC_SingleEnded(channel);
-    }
-    else {
-        if(channel % 2 == 0)adcVal = adc12Bit.readADC_Differential_0_1();
-        else adcVal = adc12Bit.readADC_Differential_2_3();
-    }
-
-    //convert adc value to voltage using appropriate multiplier based on gain
-    switch(gain){
-        case GAIN_TWOTHIRDS:
-            return adcVal * 3.0 / 1000;
-        break;
-        case GAIN_ONE:
-            return adcVal * 2.0 / 1000;
-        break;
-        case GAIN_TWO:
-            return adcVal * 1.0 / 1000;
-        break;
-        case GAIN_FOUR:
-            return adcVal * 0.5 / 1000;
-        break;
-        case GAIN_EIGHT:
-            return adcVal * 0.25 / 1000;
-        break;
-        case GAIN_SIXTEEN:
-            return adcVal * 0.125 / 1000;
-        break;
-        default:
-            return 0.0;
-        break;
-    }
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////
