@@ -1,4 +1,40 @@
 /*
+This file was for testing as many sensors as I can together
+that I currently had in hand before our second major purchase.
+
+Sensors tested:
+    uv sensor
+    luminosity
+    light 2 frequency
+    12 bit ADC
+    uSd logger
+
+Sensors passed: - ready for Integration
+    12 bit ADC
+    uSd logger
+
+Sensors not passed & why:
+    uv sensor:
+        unable to verify sensors output values are accurate.
+        I get a noisy constant high-ish voltage from the sensor
+        with a surprisingly small difference between direct sun
+        brightness and a dark hallway darkness. Upon investigation,
+        it appears UV sensors may have a uniquely short shelf life
+        after initial exposire to moisture in the air.
+    luminosity:
+        This sensor appeared to work fine, however it's values need
+        to be verified as well as the saturation variable returned
+        true no matter what, which shouldn't happen. I've read that
+        it could trip early since the IR range will hit a limit before
+        the visible range, but I'll need more solo testing.
+    light 2 frequency:
+        A lag was discovered during this test and after further investigation
+        it was due to this sensor alone. Theorhetically a faster controller
+        but we need the controller in the mail to tell.
+*/
+
+
+/*
 Todo:
     1. Make a scaling function to scale the values of the sensors to a common
         scale so that plot is actually useful instead of only seeing the largest
