@@ -1,0 +1,16 @@
+Confirmed that sensor is damaged. 
+
+The ML8511 should not be outputting values over 15mW/cm^2
+
+the sensor is consistently outputting values beyond this limit. I tried various hookup guides and the values are still out of range. 
+Hookup guides I tried: 
+https://learn.sparkfun.com/tutorials/ml8511-uv-sensor-hookup-guide
+https://www.dfrobot.com/wiki/index.php/UV_Sensor_v1.0-ML8511_SKU:SEN0175
+https://plot.ly/arduino/uv-sensor-tutorial/
+
+Values should be close to zero indoors and around 5mW/cm^2 outdoors
+
+This is a list of people who have tested with accurate results. 
+My hookup and code was identical to theirs which leads me to believe the sensor is broken. 
+http://rdiot.tistory.com/72
+https://rydepier.wordpress.com/2016/03/31/arduino-and-ml8511-uv-detector/
