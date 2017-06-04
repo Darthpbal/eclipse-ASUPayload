@@ -18,7 +18,6 @@ private:
     //Here's some default settings a user may want to change.
     runMode mode;     //determines if all data will be printed, or only
                             //lines matching the desired gps tag
-    int baud;        //baud rate for the venus software serial port
     char gpsTag[gpsTagSize];     //desired gps tag
     unsigned int timeout;    //controls how long the board waits for a gps tag before a timing out
     bool saveMode;      //controls whether to save to venus board's flash
@@ -57,8 +56,10 @@ public:
 
     bool readSentence();                        //read a normal gps sentence
     void begin(int baud);                       //set software serial port baud rate
+    void setGpsTag(char* tag);                  //seeter for the gps tag
+    void getGpsTag(char* buffer);               //getter for the gps tag
     void getResponse(char *buffer);             //return
-    void setRunMode(runMode mode);              //set whether or not to filter incoming data
+    void setRunMode(runMode newMode);              //set whether or not to filter incoming data
     void getSentence(char* buffer);             //fills the buffer with the last sentence seen
     void getField(char* buffer, int index);     //fills the buffer with whatever desired index
     bool getSoftwareVersion(char* buffer);      //fills the buffer with the software version

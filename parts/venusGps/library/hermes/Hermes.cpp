@@ -11,11 +11,10 @@ Hermes::Hermes (SoftwareSerial *serial){
     serialPort = serial;
 
     //library settings
-    mode = raw;
-    baud = 9600;
-    gpsTag[0] = 'G';
+    setRunMode(raw);
+    setGpsTag("$GPGGA");
     timeout = 5000;
-    saveMode = false;
+    setSaveMode(false);
 }
 
 
@@ -51,6 +50,9 @@ bool Hermes::readSentence(){
 
 
 void Hermes::getSentence(char* buffer){
+    for (int i = 0; i < sentenceSize; i++) {
+        buffer[i] = sentence[i];
+    }
 }
 
 
@@ -72,16 +74,35 @@ bool Hermes::readResponse(){
 
 
 void Hermes::getResponse(char *buffer){
+    for (int i = 0; i < responseSize; i++) {
+        buffer[i] = response[i];
+    }
 }
 
 
 
-void Hermes::setRunMode(runMode mode){
+void Hermes::setRunMode(runMode newMode){
+    mode = newMode;
 }
 
 
 
 void Hermes::getField(char* buffer, int index){
+    int sentencePos = 0;
+    int fieldPos = 0;
+    int commaCount = 0;
+    while (sentencePos < sentenceSize){
+        if (sentence[sentencePos] == ','){
+            commaCount ++;
+            sentencePos ++;
+        }
+        if (commaCount == index){
+            buffer[fieldPos] = sentence[sentencePos];
+            fieldPos ++;
+        }
+        sentencePos ++;
+    }
+    buffer[fieldPos] = '\0';
 }
 
 
@@ -131,7 +152,8 @@ bool Hermes::getWaas(char* buffer){
 
 
 
-bool Hermes::setSaveMode(bool permanent = 0){
+bool Hermes::setSaveMode(bool permanent = false){
+    saveMode = permanent;
 }
 
 
@@ -172,7 +194,20 @@ bool Hermes::getPps(int* mode){
 
 
 
+void Hermes::setGpsTag(char* tag){
+    for (int i = 0; i < gpsTagSize; i++) {
+        gpsTag[i] = tag[i];
+    }
+}
 
+
+
+
+void Hermes::getGpsTag(char* buffer){
+    for (int i = 0; i < gpsTagSize; i++) {
+        buffer[i] = gpsTag[i];
+    }
+}
 
 
 
