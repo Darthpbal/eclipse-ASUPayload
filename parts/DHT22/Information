@@ -1,0 +1,10 @@
+*/
+Product page:
+https://www.adafruit.com/product/393?gclid=CjwKEAjw387JBRDPtJePvOej8kASJADkV9TLgpOvQe3ipTCoVOTR3bNfEUBbSl4dv_RxB5C7bec14RoCn23w_wcB
+
+Spec Sheet:
+https://cdn-shop.adafruit.com/datasheets/Digital+humidity+and+temperature+sensor+AM2302.pdf
+
+Download these libraries:
+https://github.com/adafruit/DHT-sensor-library
+https://github.com/adafruit/Adafruit_Sensor
