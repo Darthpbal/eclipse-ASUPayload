@@ -54,7 +54,8 @@ private:
 public:
     Hermes (SoftwareSerial *serial);            //ctor, sets the member software serial pointer to the ctor argument
 
-    bool readSentence();                        //read a normal gps sentence
+    bool readSentence();
+    void clearSentence();                       //read a normal gps sentence
     void begin(int baud);                       //set software serial port baud rate
     void setGpsTag(char* tag);                  //seeter for the gps tag
     void getGpsTag(char* buffer);               //getter for the gps tag

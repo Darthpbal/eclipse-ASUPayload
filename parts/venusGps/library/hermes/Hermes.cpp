@@ -15,6 +15,7 @@ Hermes::Hermes (SoftwareSerial *serial){
     setGpsTag("$GPGGA");
     setTimeout(5000);
     setSaveMode(false);
+    clearSentence();
 }
 
 
@@ -46,17 +47,25 @@ bool Hermes::readSentence(){
             sentence[currentChar] = serialPort->read();    //store char into gps string
             currentChar++;    //move to next position
         }
-        while(sentence[currentChar - 1] != '\r');    //this board has a "carraige return" and "line feed" and the end of each transmission. this "\r" is the cairraige return. This loops until that is seen and then the NULL character "\0" is set at the end to be a valid c-string that can be used with serial print.
+        while(sentence[currentChar - 1] != '\n');    //this board has a "carraige return" and "line feed" and the end of each transmission. this "\r" is the cairraige return. This loops until that is seen and then the NULL character "\0" is set at the end to be a valid c-string that can be used with serial print.
         sentence[currentChar - 1] = '\0';
         sentence[currentChar] = '\0';
 
         Serial.println(sentence);
+        Serial.println("end of sentence");
     }
     else {
         Serial.println("invalid answer");
     }
-
     ////////nother version for reading a sentence//////////////////////
+}
+
+
+
+void Hermes::clearSentence(){
+    for (int i = 0; i < sentenceSize; i++) {
+        sentence[i] = '\0';
+    }
 }
 
 
