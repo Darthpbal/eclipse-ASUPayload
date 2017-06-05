@@ -134,9 +134,11 @@ void Hermes::mapMsgToPayloadLength(int msgId){
 
 
 unsigned int Hermes::calcChecksum(){
+    unsigned int checksum = 0;
     for (int i = 0; i < payloadLength; i++) {
-        /* code */
+        checksum ^= payload[i];
     }
+    return checksum;
 }
 
 
