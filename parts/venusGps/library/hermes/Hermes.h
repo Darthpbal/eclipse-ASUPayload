@@ -41,7 +41,7 @@ private:
     byte payload[payloadSize];
     byte response[responseSize];
     unsigned int payloadLength;
-    void mapMsgToPayloadLength();               //for setting the payload length to the appropriate value for all messages I'll implement
+    void mapMsgToPayloadLength(int msgId);               //for setting the payload length to the appropriate value for all messages I'll implement
     unsigned int calcChecksum();                //for calculating the checksum
     bool readResponse();                        //reads the ACk response of the GPS
     bool detectFlag(char *flag);                //for listening on a serial port and returning true when a sequence is seen
@@ -58,6 +58,8 @@ public:
     void begin(int baud);                       //set software serial port baud rate
     void setGpsTag(char* tag);                  //seeter for the gps tag
     void getGpsTag(char* buffer);               //getter for the gps tag
+    void setTimeout(unsigned int newTimeout);                          //seeter and getter for timout
+    unsigned int getTimeout();                          //
     void getResponse(char *buffer);             //return
     void setRunMode(runMode newMode);              //set whether or not to filter incoming data
     void getSentence(char* buffer);             //fills the buffer with the last sentence seen

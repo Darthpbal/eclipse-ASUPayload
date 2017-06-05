@@ -13,8 +13,18 @@ Hermes::Hermes (SoftwareSerial *serial){
     //library settings
     setRunMode(raw);
     setGpsTag("$GPGGA");
-    timeout = 5000;
+    setTimeout(5000);
     setSaveMode(false);
+}
+
+
+
+void Hermes::setTimeout(unsigned int newTimeout){
+    timeout = newTimeout;
+}
+
+unsigned int Hermes::getTimeout(){
+    return timeout;
 }
 
 
@@ -45,6 +55,8 @@ bool Hermes::readSentence(){
     else {
         Serial.println("invalid answer");
     }
+
+    ////////nother version for reading a sentence//////////////////////
 }
 
 
@@ -57,12 +69,74 @@ void Hermes::getSentence(char* buffer){
 
 
 
-void Hermes::mapMsgToPayloadLength(){
+void Hermes::mapMsgToPayloadLength(int msgId){
+    switch (msgId) {
+        case 0x2:
+        break;
+        case 0x4:
+        break;
+        case 0x5:
+        break;
+        case 0x8:
+        break;
+        case 0x9:
+        break;
+        case 0xC:
+        break;
+        case 0xE:
+        break;
+        case 0x10:
+        break;
+        case 0x37:
+        break;
+        case 0x38:
+        break;
+        case 0x39:
+        break;
+        case 0x3A:
+        break;
+        case 0x3B:
+        break;
+        case 0x3C:
+        break;
+        case 0x3D:
+        break;
+        case 0x3E:
+        break;
+        case 0x3F:
+        break;
+        case 0x80:
+        break;
+        case 0x81:
+        break;
+        case 0x82:
+        break;
+        case 0x83:
+        break;
+        case 0x84:
+        break;
+        case 0x86:
+        break;
+        case 0xB3:
+        break;
+        case 0xB4:
+        break;
+        case 0xB5:
+        break;
+        case 0xB6:
+        break;
+        default:
+            payloadLength = 0;
+        break;
+    }
 }
 
 
 
 unsigned int Hermes::calcChecksum(){
+    for (int i = 0; i < payloadLength; i++) {
+        /* code */
+    }
 }
 
 
