@@ -18,7 +18,7 @@ void setup() {
 
     memset(sentence, '\0', 100);
 
-    clearPort();
+    while( (venus.available() != 0) ) venus.read();
 
     while( readChar != '$' ) readChar = venus.read();
     sentence[charPos] = readChar;
@@ -63,8 +63,4 @@ void setup() {
 
 void loop() {
   delay(5000);
-}
-
-void clearPort(){
-    while( (venus.available() != 0) ) venus.read();
 }
