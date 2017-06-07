@@ -42,6 +42,47 @@ void loop() {
     }
 
     Serial.println('\n');
+
+    for(int i = 0; i < 21; i++){
+        venus.readLine();
+
+        Serial.print(F("time = "));
+        venus.getField(sentence, 1);    Serial.print(sentence); Serial.print(F(" , "));
+
+        Serial.print(F("latitude = "));
+        venus.getField(sentence, 3);    Serial.print(sentence); Serial.print(F(" "));
+        venus.getField(sentence, 4);    Serial.print(sentence); Serial.print(F(" , "));
+
+        Serial.print(F("longitude = "));
+        venus.getField(sentence, 5);    Serial.print(sentence); Serial.print(F(" "));
+        venus.getField(sentence, 6);    Serial.print(sentence); Serial.println(F(" , "));
+    }
+
+    Serial.println('\n');
+
+    venus.setGpsTag("GPGGA");
+
+    for(int i = 0; i < 21; i++){
+        venus.readLine();
+
+        Serial.print(F("time = "));
+        venus.getField(sentence, 1);    Serial.print(sentence); Serial.print(F(" , "));
+
+
+        Serial.print(F("latitude = "));
+        venus.getField(sentence, 2);    Serial.print(sentence); Serial.print(F(" "));
+        venus.getField(sentence, 3);    Serial.print(sentence); Serial.print(F(" ,"));
+
+        Serial.print(F("longitude = "));
+        venus.getField(sentence, 4);    Serial.print(sentence); Serial.print(F(" "));
+        venus.getField(sentence, 5);    Serial.print(sentence); Serial.print(F(" "));
+        
+        Serial.print(F("altitude = "));
+        venus.getField(sentence, 9);    Serial.print(sentence); Serial.println(F(" "));
+    }
+
+    Serial.println('\n');
+    Serial.println('\n');
     Serial.println('\n');
     Serial.println('\n');
 }

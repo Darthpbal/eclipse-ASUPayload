@@ -62,6 +62,7 @@ public:
 
 
 
+
     void getResponse(char *buffer);             //return
 
     bool getSoftwareVersion(char* buffer);      //fills the buffer with the software version
