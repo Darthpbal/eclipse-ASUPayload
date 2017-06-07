@@ -20,6 +20,9 @@ private:
     runMode mode;     //determines if all data will be printed, or only
                             //lines matching the desired gps tag
     char gpsTag[gpsTagSize];     //desired gps tag
+    char readChar;
+    char sentenceFlag;
+    bool tagDetected;
     unsigned int timeout;    //controls how long the board waits for a gps tag before a timing out
     bool saveMode;      //controls whether to save to venus board's flash
                                 //or not. This will make whatever settings change
@@ -45,8 +48,6 @@ private:
     void mapMsgToPayloadLength(int msgId);               //for setting the payload length to the appropriate value for all messages I'll implement
     unsigned int calcChecksum();                //for calculating the checksum
     bool readResponse();                        //reads the ACk response of the GPS
-    bool detectFlag(char *flag);                //for listening on a serial port and returning true when a sequence is seen
-    void addTag();
     SoftwareSerial *serialPort;
     byte msgStartFlag[2] = {0xA0, 0xA1},
         msgEndFlag[2] = {0x0D, 0x0A};
@@ -56,8 +57,11 @@ private:
 public:
     Hermes (SoftwareSerial *serial);            //ctor, sets the member software serial pointer to the ctor argument
 
-    bool readSentence();
-    void clearSentence();                       //read a normal gps sentence
+    void readFilteredLine();
+    void readRawLine();
+    bool readLine();
+    void clearLine();                       //read a normal gps sentence
+    void getLine(char* buffer);             //fills the buffer with the last sentence seen
     void begin(int baud);                       //set software serial port baud rate
     void setGpsTag(char* tag);                  //seeter for the gps tag
     void getGpsTag(char* buffer);               //getter for the gps tag
@@ -65,11 +69,10 @@ public:
     unsigned int getTimeout();                          //
     void getResponse(char *buffer);             //return
     void setRunMode(runMode newMode);              //set whether or not to filter incoming data
-    void getSentence(char* buffer);             //fills the buffer with the last sentence seen
     void getField(char* buffer, int index);     //fills the buffer with whatever desired index
     bool getSoftwareVersion(char* buffer);      //fills the buffer with the software version
     bool setDefault();                          //sets the device the command to reset to factory defaults
-    bool setSerialBaud(int speed);              //sends the gps the commands to configure it's baud rate
+    bool setGPSSerialBaud(int speed);              //sends the gps the commands to configure it's baud rate
     bool setNmeaContent(int gga, int gsa, int gsv, int gll, int rmc, int vtg, int zda);     //configures what type of NMEA sentences are reported
     bool setMsgType(int type);                  //turns ff the nmea output or sets it to normal and binary mode.
     bool setPowerMode(int mode);                //sets the power mode on the gps
