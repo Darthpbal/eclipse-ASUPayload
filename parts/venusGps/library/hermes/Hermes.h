@@ -10,6 +10,7 @@ typedef enum { raw, filtered } runMode;
 
 class Hermes {
 private:
+    int charPos;
     const static int sentenceSize = 100,
                         gpsTagSize = 10,
                         payloadSize = 20,
@@ -45,6 +46,7 @@ private:
     unsigned int calcChecksum();                //for calculating the checksum
     bool readResponse();                        //reads the ACk response of the GPS
     bool detectFlag(char *flag);                //for listening on a serial port and returning true when a sequence is seen
+    void addTag();
     SoftwareSerial *serialPort;
     byte msgStartFlag[2] = {0xA0, 0xA1},
         msgEndFlag[2] = {0x0D, 0x0A};
