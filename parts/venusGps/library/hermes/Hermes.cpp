@@ -59,6 +59,12 @@ void Hermes::readRawLine(){
 
 
 
+int Hermes::geLineSize(){
+    return charPos;
+}
+
+
+
 void Hermes::readFilteredLine(){
     tagDetected = false;
     do{

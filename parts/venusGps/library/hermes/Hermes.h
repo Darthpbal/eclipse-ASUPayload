@@ -1,3 +1,4 @@
+
 #ifndef Hermes_h
 #define Hermes_h
 
@@ -27,7 +28,6 @@ private:
     bool saveMode;
 
 
-    char sentence[sentenceSize];
     byte payload[payloadSize];
     byte response[responseSize];
     unsigned int payloadLength;
@@ -45,12 +45,14 @@ private:
 
 
 public:
+    char sentence[sentenceSize];    // I think i like the sentence as a public member, since the obligation to create another c string to retreive data from the library is redundant and annoying.
     Hermes (SoftwareSerial *serial);            //ctor, sets the member software serial pointer to the ctor argument
     void begin(int baud);                       //set software serial port baud rate
     void setRunMode(runMode newMode);              //set whether or not to filter incoming data
 
     bool readLine();
     void getLine(char* buffer);             //fills the buffer with the last sentence seen
+    int geLineSize();
 
     void getField(char* buffer, int index);     //fills the buffer with whatever desired index
 
