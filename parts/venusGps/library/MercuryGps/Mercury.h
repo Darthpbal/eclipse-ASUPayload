@@ -1,6 +1,6 @@
 
-#ifndef Hermes_h
-#define Hermes_h
+#ifndef Mercury_h
+#define Mercury_h
 
 #include "Arduino.h"
 #include <SoftwareSerial.h>
@@ -9,7 +9,7 @@
 //typedef enum runMode = {r/aw, filtered};
 typedef enum { raw, filtered } runMode;
 
-class Hermes {
+class Mercury {
 private:
     int charPos;
     const static int sentenceSize = 100,
@@ -46,7 +46,7 @@ private:
 
 public:
     char sentence[sentenceSize];    // I think i like the sentence as a public member, since the obligation to create another c string to retreive data from the library is redundant and annoying.
-    Hermes (SoftwareSerial *serial);            //ctor, sets the member software serial pointer to the ctor argument
+    Mercury (SoftwareSerial *serial);            //ctor, sets the member software serial pointer to the ctor argument
     void begin(int baud);                       //set software serial port baud rate
     void setRunMode(runMode newMode);              //set whether or not to filter incoming data
 
