@@ -59,7 +59,7 @@ void Mercury::readRawLine(){
 
 
 
-int Mercury::geLineSize(){
+int Mercury::getLineSize(){
     return charPos;
 }
 
@@ -138,6 +138,53 @@ void Mercury::getField(char* buffer, int index){
         sentencePos ++;
     }
     buffer[fieldPos] = '\0';
+}
+
+
+
+bool Mercury::getSoftwareVersion(char* buffer){
+    memset(binaryMsg, 0x0, binaryBufferMsgSize);
+    binaryMsg[0] = msgStartFlag[0];
+    binaryMsg[1] = msgStartFlag[1];
+}
+
+
+
+bool Mercury::readBinMsg(){
+    memset(binaryMsg, 0x0, binaryBufferMsgSize);
+
+    tagDetected = false;
+    do{
+      while(serialPort->available() == 0);
+      readByte = serialPort->read();
+      if(prevByte == 0xA0 && readByte == 0xA1) break;
+      else prevByte = readByte;
+    }
+    while(tagDetected == false);
+
+    binaryMsg[0] = prevByte;
+    binaryMsg[1] = readByte;
+
+
+    tagDetected = false;
+    charPos = 2;
+
+    do{
+        do{
+            while(serialPort->available() == 0);
+            readByte = serialPort->read();
+            binaryMsg[charPos] = readByte;
+            charPos++;
+            if(prevByte == 0x0D && readByte == 0x0A) break;
+            else {
+              prevByte = readByte;
+            }
+        }
+        while( (charPos < binaryBufferMsgSize) );
+        tagDetected = true;
+    }
+    while(tagDetected == false);
+
 }
 
 
@@ -302,8 +349,6 @@ unsigned int Mercury::calcChecksum(){
 
 
 
-bool Mercury::readResponse(){
-}
 
 
 
