@@ -51,7 +51,7 @@ Where:
 #include <SPI.h>                //SPI class
 #include <SD.h>                 //sd card file access class
 #include "Adafruit_ADS1015.h"   //12 bit adc class
-#include <Adafruit_MPL3115A2.h>
+#include "Adafruit_MPL3115A2.h"
 
 
 
@@ -192,18 +192,18 @@ void loop() {
 
 
     //altimeter
-    float pascals = baro.getPressure();
+    float pascals = altimeter.getPressure();
     logLine += pascals;
     logLine += delim;
 
     logLine += pascals / 101325;
     logLine += delim;
 
-    logLine = baro.getAltitude();
+    logLine = altimeter.getAltitude();
     logLine += delim;
 
-    // logLine = baro.getTemperature(); // in celcius
-    logLine = ( ( 9 * baro.getTemperature() ) / 5) + 32; // in fahrenheight
+    // logLine = altimeter.getTemperature(); // in celcius
+    logLine = ( ( 9 * altimeter.getTemperature() ) / 5) + 32; // in fahrenheight
     logLine += delim;
     //end altimeter
 
