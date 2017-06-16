@@ -15,7 +15,7 @@ void setup() {
 
 void loop() {
     if(venusGps.available()){
-        char currentChar = venus.read();
+        byte currentChar = venus.read();
         Serial.print(currentChar, HEX);
         if(currentChar == 0x0A && prevChar == 0x0D) Serial.print('\n');
         else Serial.print(' ');
