@@ -51,6 +51,8 @@ Where:
 #include <SPI.h>                //SPI class
 #include <SD.h>                 //sd card file access class
 #include "Adafruit_ADS1015.h"   //12 bit adc class
+#include <Adafruit_MPL3115A2.h>
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,6 +91,13 @@ Adafruit_ADS1115 adc16Bit;
 // int channelName = 0;  //uncomment this when adding analog channels to read.
 //end adc
 
+
+//altimeter
+Adafruit_MPL3115A2 altimeter = Adafruit_MPL3115A2();
+//end altimeter
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //             End of global variables
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,9 +135,13 @@ void setup() {
 
     /*
     header definitions:
-    millis:        = a millis timestamp showing how many milliseconds the current program has been running
+    pascals(absPres)          = pressure in pascals read by the MPL3115A2 altimeter
+    atmospheres(absPres)      = pressure in atmospheres read by the MPL3115A2 altimeter
+    altitude(absPres)         = altitude in meters read by the MPL3115A2 altimeter
+    tempC(absPres)            = temperature in C read by the MPL3115A2 altimeter
+    millis:                   = a millis timestamp showing how many milliseconds the current program has been running
     */
-    String header = "millis\n";
+    String header = "pascals(absPres),atmospheres(absPres),altitudeMeters(absPres),tempC(absPres),millis\n";
     if(mode  == debug) Serial.print(header);
     else if(mode == launch) lineLogger(header);
 }//end of setup
@@ -175,6 +188,24 @@ void loop() {
 
 
     //put sensors here.
+
+
+
+    //altimeter
+    float pascals = baro.getPressure();
+    logLine += pascals;
+    logLine += delim;
+
+    logLine += pascals / 101325;
+    logLine += delim;
+
+    logLine = baro.getAltitude();
+    logLine += delim;
+
+    // logLine = baro.getTemperature(); // in celcius
+    logLine = ( ( 9 * baro.getTemperature() ) / 5) + 32; // in fahrenheight
+    logLine += delim;
+    //end altimeter
 
 
 
