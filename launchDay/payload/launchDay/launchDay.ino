@@ -85,7 +85,7 @@ bool alreadyBegan = false;  // SD.begin() misbehaves if not first call
 
 
 //adc
-Adafruit_ADS1015 adc12Bit;
+Adafruit_ADS1115 adc16Bit;
 // int channelName = 0;  //uncomment this when adding analog channels to read.
 //end adc
 
@@ -288,47 +288,49 @@ single0_diff1: Boolean value for choosing between measuring a single ended signa
                 Single ended: channels directly correspond to actual ADC channels
                 differential: channel 0 is differential between 0-1, and 1 is between 2-3
 
-GAIN_TWOTHIRDS   2/3x gain +/- 6.144V  1 bit = 3mV    (default)
-GAIN_ONE         1x gain   +/- 4.096V  1 bit = 2mV
-GAIN_TWO         2x gain   +/- 2.048V  1 bit = 1mV
-GAIN_FOUR        4x gain   +/- 1.024V  1 bit = 0.5mV
-GAIN_EIGHT       8x gain   +/- 0.512V  1 bit = 0.25mV
-GAIN_SIXTEEN     16x gain  +/- 0.256V  1 bit = 0.125mV
+                                              ADS1015  ADS1115
+                                              -------  -------
+GAIN_TWOTHIRDS  2/3x gain +/- 6.144V  1 bit = 3mV      0.1875mV (default)
+GAIN_ONE        1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
+GAIN_TWO        2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
+GAIN_FOUR       4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
+GAIN_EIGHT      8x gain   +/- 0.512V  1 bit = 0.25mV   0.015625mV
+GAIN_SIXTEEN    16x gain  +/- 0.256V  1 bit = 0.125mV  0.0078125mV
 */
 float getVoltageWGain(int channel, adsGain_t gain, bool single0_diff1){
     int16_t adcVal = 0;
 
-    adc12Bit.setGain(gain);
+    adc16Bit.setGain(gain);
 
     //read from the desired channel in single ended or differential
     //differential 0-1 is channel 0 and differential 2-3 is channel 1
     if(!single0_diff1){
-        adcVal = adc12Bit.readADC_SingleEnded(channel);
+        adcVal = adc16Bit.readADC_SingleEnded(channel);
     }
     else {
-        if(channel % 2 == 0)adcVal = adc12Bit.readADC_Differential_0_1();
-        else adcVal = adc12Bit.readADC_Differential_2_3();
+        if(channel % 2 == 0)adcVal = adc16Bit.readADC_Differential_0_1();
+        else adcVal = adc16Bit.readADC_Differential_2_3();
     }
 
     //convert adc value to voltage using appropriate multiplier based on gain
     switch(gain){
         case GAIN_TWOTHIRDS:
-            return adcVal * 3.0 / 1000;
+            return adcVal * 0.1875 / 1000;
         break;
         case GAIN_ONE:
-            return adcVal * 2.0 / 1000;
+            return adcVal * 0.125 / 1000;
         break;
         case GAIN_TWO:
-            return adcVal * 1.0 / 1000;
+            return adcVal * 0.0625 / 1000;
         break;
         case GAIN_FOUR:
-            return adcVal * 0.5 / 1000;
+            return adcVal * 0.03125 / 1000;
         break;
         case GAIN_EIGHT:
-            return adcVal * 0.25 / 1000;
+            return adcVal * 0.015625 / 1000;
         break;
         case GAIN_SIXTEEN:
-            return adcVal * 0.125 / 1000;
+            return adcVal * 0.0078125 / 1000;
         break;
         default:
             return 0.0;
