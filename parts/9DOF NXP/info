@@ -1,0 +1,16 @@
+Product Page:
+https://www.adafruit.com/product/3463
+Spec Sheet:
+gyro - https://cdn-learn.adafruit.com/assets/assets/000/040/671/original/FXAS21002.pdf?1491475056
+Accel/mag - https://cdn-learn.adafruit.com/assets/assets/000/040/672/original/FXOS8700CQ.pdf?1491475067
+Libraries download:
+https://learn.adafruit.com/nxp-precision-9dof-breakout/downloads
+General Overview/hookup guide:
+https://learn.adafruit.com/nxp-precision-9dof-breakout/overview
+
+Before using you must calibrate!
+-Calibration software download:
+https://www.pjrc.com/store/prop_shield.html
+-load the ahrs_calibration_usb sketch from Adafruit_AHRS
+-select port on GUI
+-keep variances low when testing
