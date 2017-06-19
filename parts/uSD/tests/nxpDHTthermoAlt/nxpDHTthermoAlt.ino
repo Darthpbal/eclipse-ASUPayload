@@ -82,7 +82,7 @@ DHT dht(DHTPIN, DHTTYPE);
 
 //start thermometer
 #include <Adafruit_MAX31865.h>
-Adafruit_MAX31865 max = Adafruit_MAX31865(10, 11, 12, 13);
+Adafruit_MAX31865 max = Adafruit_MAX31865(4,5,6,7); // migrate from 10,11,12,13 to 4,5,6,7
 #define RREF 430.0
 //end thermometer
 
@@ -327,22 +327,22 @@ void loop() {
 
 
 // adafruit lux related functions
-void configureSensor(void)
-{
-  /* You can also manually set the gain or enable auto-gain support */
-  // tsl.setGain(TSL2561_GAIN_1X);      /* No gain ... use in bright light to avoid sensor saturation */
-  // tsl.setGain(TSL2561_GAIN_16X);     /* 16x gain ... use in low light to boost sensitivity */
-  tsl.enableAutoRange(true);            /* Auto-gain ... switches automatically between 1x and 16x */
-
-  /* Changing the integration time gives you better sensor resolution (402ms = 16-bit data) */
-  tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_13MS);      /* fast but low resolution */
-  // tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_101MS);  /* medium resolution and speed   */
-  // tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_402MS);  /* 16-bit data but slowest conversions */
-
-  /* Update these values depending on what you've set above! */
-  // Serial.println("------------------------------------");
-  // Serial.print  ("Gain:         "); Serial.println("Auto");
-  // Serial.print  ("Timing:       "); Serial.println("13 ms");
-  // Serial.println("------------------------------------");
-}
+// void configureSensor(void)
+// {
+//   /* You can also manually set the gain or enable auto-gain support */
+//   // tsl.setGain(TSL2561_GAIN_1X);      /* No gain ... use in bright light to avoid sensor saturation */
+//   // tsl.setGain(TSL2561_GAIN_16X);     /* 16x gain ... use in low light to boost sensitivity */
+//   tsl.enableAutoRange(true);            /* Auto-gain ... switches automatically between 1x and 16x */
+//
+//   /* Changing the integration time gives you better sensor resolution (402ms = 16-bit data) */
+//   tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_13MS);      /* fast but low resolution */
+//   // tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_101MS);  /* medium resolution and speed   */
+//   // tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_402MS);  /* 16-bit data but slowest conversions */
+//
+//   /* Update these values depending on what you've set above! */
+//   // Serial.println("------------------------------------");
+//   // Serial.print  ("Gain:         "); Serial.println("Auto");
+//   // Serial.print  ("Timing:       "); Serial.println("13 ms");
+//   // Serial.println("------------------------------------");
+// }
 // end adafruit lux related functions
