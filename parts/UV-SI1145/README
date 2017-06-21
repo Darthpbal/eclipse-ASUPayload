@@ -1,0 +1,12 @@
+Product page:
+https://www.adafruit.com/product/1777
+Overview and hookup:
+https://learn.adafruit.com/adafruit-si1145-breakout-board-uv-ir-visible-sensor/overview
+Datasheet:
+https://cdn-shop.adafruit.com/datasheets/Si1145-46-47.pdf
+Info:
+approximates UV using visible and IR elements that can be accessed individually. Given code provides data in UV index. 
+
+Test with a UV led from sparkfun
+https://www.sparkfun.com/products/8662
+https://www.sparkfun.com/datasheets/Components/LED/YSL-R547P4C-E3.pdf
