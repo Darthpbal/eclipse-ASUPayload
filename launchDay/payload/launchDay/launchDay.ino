@@ -42,38 +42,51 @@ Where:
 */
 
 
+
+
+
+
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
-//               Start of including headers
+//                Declare globals and include headers
 ////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 #include <Wire.h>               //I2C class
 #include <SPI.h>                //SPI class
 #include <SD.h>                 //sd card file access class
-#include "Adafruit_ADS1015.h"   //12 bit adc class
-#include "Adafruit_MPL3115A2.h"
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-//                End of including headers
-////////////////////////////////////////////////////////////////////////////////
+// #include "Adafruit_ADS1015.h"   //12 bit adc class
+
+//altimeter
+#include "Adafruit_MPL3115A2.h"    // altimeter
+Adafruit_MPL3115A2 altimeter = Adafruit_MPL3115A2();
+//end altimeter
+
+
+//DHT22
+#include "DHT.h"
+#define DHTPIN 2     // what digital pin we're connected to
+#define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
+DHT dht(DHTPIN, DHTTYPE);
+//end DHT22
 
 
 
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-//                Declare globals
-////////////////////////////////////////////////////////////////////////////////
-
-char delim;  //the seperator that will be printed to seperate all values.
 
 
 //determines how printing is handled for launch debug and graphing contexts
 enum configuration { launch, debug, plot };
 const configuration mode = launch;
+char delim;  //the seperator that will be printed to seperate all values.
 
 
 
@@ -87,19 +100,16 @@ bool alreadyBegan = false;  // SD.begin() misbehaves if not first call
 
 
 //adc
-Adafruit_ADS1115 adc16Bit;
+// Adafruit_ADS1115 adc16Bit;
 // int channelName = 0;  //uncomment this when adding analog channels to read.
 //end adc
 
 
-//altimeter
-Adafruit_MPL3115A2 altimeter = Adafruit_MPL3115A2();
-//end altimeter
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//             End of global variables
+//             End of global variables and included headers
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -131,6 +141,8 @@ void setup() {
     if(mode == launch) initializeCard();
     //end uSd Card
 
+    dht.begin();
+
 
 
     /*
@@ -141,7 +153,19 @@ void setup() {
     tempC(absPres)            = temperature in C read by the MPL3115A2 altimeter
     millis:                   = a millis timestamp showing how many milliseconds the current program has been running
     */
-    String header = "pascals(absPres),atmospheres(absPres),altitudeMeters(absPres),tempC(absPres),millis\n";
+    String header = ""; //create header variable
+
+    header += "pascals(absPres),";
+    header += "atmospheres(absPres),";
+    header += "altitudeMeters(absPres),";
+    header += "tempC(absPres),";
+
+    header += "humidity%(dht22),";
+    header += "tempF(dht22),";
+    header += "heatIndxF(dht22),";
+
+
+    header += "millis\n";
     if(mode  == debug) Serial.print(header);
     else if(mode == launch) lineLogger(header);
 }//end of setup
