@@ -61,10 +61,17 @@ Where:
 #include <Wire.h>               //I2C class
 #include <SPI.h>                //SPI class
 #include <SD.h>                 //sd card file access class
+#include <SoftwareSerial.h>     // software serial library
 
 
 
 // #include "Adafruit_ADS1015.h"   //12 bit adc class
+
+// start GPS
+SoftwareSerial venusSerialPort(2,3); // rx, tx. Setup the venus SoftwareSerial port
+Mercury venus(&venusSerialPort);
+// end GPS
+
 
 //altimeter
 #include "Adafruit_MPL3115A2.h"    // altimeter
@@ -144,6 +151,8 @@ void setup() {
     //humidity sensor
     dht.begin();
 
+    //gps
+    venus.begin(9600);
 
 
     /*
@@ -164,6 +173,15 @@ void setup() {
     header += "humidity%(dht22),";
     header += "tempF(dht22),";
     header += "heatIndxF(dht22),";
+
+    header += "latitude(gps),";
+    header += "longitude(gps),";
+    header += "altitudeMeters(gps),";
+    header += "fixQuality(gps),";
+    header += "posDilution(gps),";
+    header += "geoidHeightMeters(gps),";
+    header += "numSatsTracked(gps),";
+    header += "fixTime(gps),";
 
 
     header += "millis\n";
@@ -211,8 +229,6 @@ void loop() {
 
 
 
-
-    //put sensors here.
 
 
 
@@ -266,6 +282,65 @@ void loop() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //start gps
+    // check the GPS field explaination
+    // to see the field numbers
+    char gpsData[20];
+
+    venus.setRunMode(filtered);
+    venus.setGpsTag("GPGGA");
+    venus.readline();
+
+    venus.getField(gpsData, 2);  // latitude(gps)
+    logLine += gpsData;
+    logLine += delim;
+
+    venus.getField(gpsData, 5);  // longitude eastwest
+    if(gpsData[0] == 'W') logLine += '-';
+
+    venus.getField(gpsData, 4);  // longitude(gps)
+    logLine += gpsData;
+    logLine += delim;
+
+    venus.getField(gpsData, 9);  // altitudeMeters(gps)
+    logLine += gpsData;
+    logLine += delim;
+
+    venus.getField(gpsData, 6);  // fixQuality(gps)
+    logLine += gpsData;
+    logLine += delim;
+
+    venus.getField(gpsData, 8);  // posDilution(gps)
+    logLine += gpsData;
+    logLine += delim;
+
+    venus.getField(gpsData, 11);  // geoidHeightMeters(gps)
+    logLine += gpsData;
+    logLine += delim;
+
+    venus.getField(gpsData, 7);  // numSatsTracked(gps)
+    logLine += gpsData;
+    logLine += delim;
+
+    venus.getField(gpsData, 1);  // fixTime(gps)
+    logLine += gpsData;
+    logLine += delim;
+
+    //end gps
 
 
 
