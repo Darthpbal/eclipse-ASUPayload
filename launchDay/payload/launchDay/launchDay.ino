@@ -141,6 +141,7 @@ void setup() {
     if(mode == launch) initializeCard();
     //end uSd Card
 
+    //humidity sensor
     dht.begin();
 
 
@@ -232,6 +233,33 @@ void loop() {
     //end altimeter
 
 
+
+
+
+
+    //start dht22
+    float humidity = dht.readHumidity(); //get humitidy percentage
+    float tempF = dht.readTemperature(true); //read temp in fahrenheight
+
+    // Check if any reads failed and exit early (to try again).
+    if ( isnan(humidity) || isnan(tempF) ) {
+      logLine += "-1";
+      logLine += delim;
+      logLine += "-1";
+      logLine += delim;
+      logLine += "-1";
+      logLine += delim;
+    }
+    else {
+        logLine += humidity
+        logLine += delim;
+        logLine += tempF;
+        logLine += delim;
+        logLine += dht.computeHeatIndex(tempF, humidity);
+        logLine += delim;
+    }
+
+    //end dht22
 
 
 
