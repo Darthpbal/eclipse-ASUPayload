@@ -68,6 +68,7 @@ Where:
 // #include "Adafruit_ADS1015.h"   //12 bit adc class
 
 // start GPS
+#include "Mercury.h"
 SoftwareSerial venusSerialPort(2,3); // rx, tx. Setup the venus SoftwareSerial port
 Mercury venus(&venusSerialPort);
 // end GPS
