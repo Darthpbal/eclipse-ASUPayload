@@ -58,7 +58,7 @@ boolean Adafruit_MPL3115A2::begin() {
 	 MPL3115A2_CTRL_REG1_SBYB |
 	 MPL3115A2_CTRL_REG1_OS128 |
 	 MPL3115A2_CTRL_REG1_ALT);
-  write8(MPL3115A2_PT_DATA_CFG, 
+  write8(MPL3115A2_PT_DATA_CFG,
 	 MPL3115A2_PT_DATA_CFG_TDEFE |
 	 MPL3115A2_PT_DATA_CFG_PDEFE |
 	 MPL3115A2_PT_DATA_CFG_DREM);
@@ -73,7 +73,7 @@ boolean Adafruit_MPL3115A2::begin() {
 float Adafruit_MPL3115A2::getPressure() {
   uint32_t pressure;
 
-  write8(MPL3115A2_CTRL_REG1, 
+  write8(MPL3115A2_CTRL_REG1,
 	 MPL3115A2_CTRL_REG1_SBYB |
 	 MPL3115A2_CTRL_REG1_OS128 |
 	 MPL3115A2_CTRL_REG1_BAR);
@@ -83,10 +83,10 @@ float Adafruit_MPL3115A2::getPressure() {
     sta = read8(MPL3115A2_REGISTER_STATUS);
     delay(10);
   }
-  Wire.beginTransmission(MPL3115A2_ADDRESS); // start transmission to device 
-  Wire.write(MPL3115A2_REGISTER_PRESSURE_MSB); 
+  Wire.beginTransmission(MPL3115A2_ADDRESS); // start transmission to device
+  Wire.write(MPL3115A2_REGISTER_PRESSURE_MSB);
   Wire.endTransmission(false); // end transmission
-  
+
   Wire.requestFrom((uint8_t)MPL3115A2_ADDRESS, (uint8_t)3);// send data n-bytes read
   pressure = Wire.read(); // receive DATA
   pressure <<= 8;
@@ -103,7 +103,7 @@ float Adafruit_MPL3115A2::getPressure() {
 float Adafruit_MPL3115A2::getAltitude() {
   int32_t alt;
 
-  write8(MPL3115A2_CTRL_REG1, 
+  write8(MPL3115A2_CTRL_REG1,
 	 MPL3115A2_CTRL_REG1_SBYB |
 	 MPL3115A2_CTRL_REG1_OS128 |
 	 MPL3115A2_CTRL_REG1_ALT);
@@ -113,10 +113,10 @@ float Adafruit_MPL3115A2::getAltitude() {
     sta = read8(MPL3115A2_REGISTER_STATUS);
     delay(10);
   }
-  Wire.beginTransmission(MPL3115A2_ADDRESS); // start transmission to device 
-  Wire.write(MPL3115A2_REGISTER_PRESSURE_MSB); 
+  Wire.beginTransmission(MPL3115A2_ADDRESS); // start transmission to device
+  Wire.write(MPL3115A2_REGISTER_PRESSURE_MSB);
   Wire.endTransmission(false); // end transmission
-  
+
   Wire.requestFrom((uint8_t)MPL3115A2_ADDRESS, (uint8_t)3);// send data n-bytes read
   alt = Wire.read(); // receive DATA
   alt <<= 8;
@@ -147,10 +147,10 @@ float Adafruit_MPL3115A2::getTemperature() {
     sta = read8(MPL3115A2_REGISTER_STATUS);
     delay(10);
   }
-  Wire.beginTransmission(MPL3115A2_ADDRESS); // start transmission to device 
-  Wire.write(MPL3115A2_REGISTER_TEMP_MSB); 
+  Wire.beginTransmission(MPL3115A2_ADDRESS); // start transmission to device
+  Wire.write(MPL3115A2_REGISTER_TEMP_MSB);
   Wire.endTransmission(false); // end transmission
-  
+
   Wire.requestFrom((uint8_t)MPL3115A2_ADDRESS, (uint8_t)2);// send data n-bytes read
   t = Wire.read(); // receive DATA
   t <<= 8;
@@ -168,16 +168,23 @@ float Adafruit_MPL3115A2::getTemperature() {
 /*********************************************************************/
 
 uint8_t Adafruit_MPL3115A2::read8(uint8_t a) {
-  Wire.beginTransmission(MPL3115A2_ADDRESS); // start transmission to device 
-  Wire.write(a); // sends register address to read from
-  Wire.endTransmission(false); // end transmission
-  
-  Wire.requestFrom((uint8_t)MPL3115A2_ADDRESS, (uint8_t)1);// send data n-bytes read
-  return Wire.read(); // receive DATA
+
+    #ifdef _VARIANT_ARDUINO_DUE_X_
+        Wire.requestFrom((uint8_t) FXOS8700_ADDRESS, (uint8_t) 1, (uint32_t) reg, (uint8_t) 1);
+        while (!Wire.available());
+        return Wire.read();
+    #else
+        Wire.beginTransmission(MPL3115A2_ADDRESS); // start transmission to device
+        Wire.write(a); // sends register address to read from
+        Wire.endTransmission(false); // end transmission
+
+        Wire.requestFrom((uint8_t)MPL3115A2_ADDRESS, (uint8_t)1);// send data n-bytes read
+        return Wire.read(); // receive DATA
+    #endif
 }
 
 void Adafruit_MPL3115A2::write8(uint8_t a, uint8_t d) {
-  Wire.beginTransmission(MPL3115A2_ADDRESS); // start transmission to device 
+  Wire.beginTransmission(MPL3115A2_ADDRESS); // start transmission to device
   Wire.write(a); // sends register address to write to
   Wire.write(d); // sends register data
   Wire.endTransmission(false); // end transmission
