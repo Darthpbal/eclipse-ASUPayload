@@ -170,7 +170,7 @@ float Adafruit_MPL3115A2::getTemperature() {
 uint8_t Adafruit_MPL3115A2::read8(uint8_t a) {
 
     #ifdef _VARIANT_ARDUINO_DUE_X_
-        Wire.requestFrom((uint8_t) FXOS8700_ADDRESS, (uint8_t) 1, (uint32_t) reg, (uint8_t) 1);
+        Wire.requestFrom((uint8_t) MPL3115A2_ADDRESS, (uint8_t) 1, (uint32_t) a, (uint8_t) 1);
         while (!Wire.available());
         return Wire.read();
     #else

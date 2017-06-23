@@ -1,14 +1,12 @@
 #include "Mercury.h"
-#include <SoftwareSerial.h>
 
 
 
+//responseSize
 
 
 
-
-Mercury::Mercury (SoftwareSerial *serial){
-    serialPort = serial;
+Mercury::Mercury (){
 
     //library settings
     sentenceFlag = '$';
@@ -34,7 +32,7 @@ unsigned int Mercury::getTimeout(){
 
 
 void Mercury::begin(int baud){
-    serialPort->begin(baud);
+    Serial1.begin(baud);
 }
 
 
@@ -42,13 +40,13 @@ void Mercury::begin(int baud){
 void Mercury::readRawLine(){
     charPos = 0;
     memset(sentence, '\0', 100);
-    while( readChar != '$' ) readChar = serialPort->read();
+    while( readChar != '$' ) readChar = Serial1.read();
     sentence[charPos] = readChar;
     charPos++;
 
     do{
-        while(serialPort->available() == 0);
-        readChar = serialPort->read();
+        while(Serial1.available() == 0);
+        readChar = Serial1.read();
         sentence[charPos] = readChar;
         charPos++;
     }
@@ -155,8 +153,8 @@ bool Mercury::readBinMsg(){
 
     tagDetected = false;
     do{
-      while(serialPort->available() == 0);
-      readByte = serialPort->read();
+      while(Serial1.available() == 0);
+      readByte = Serial1.read();
       if(prevByte == 0xA0 && readByte == 0xA1) break;
       else prevByte = readByte;
     }
@@ -171,8 +169,8 @@ bool Mercury::readBinMsg(){
 
     do{
         do{
-            while(serialPort->available() == 0);
-            readByte = serialPort->read();
+            while(Serial1.available() == 0);
+            readByte = Serial1.read();
             binaryMsg[charPos] = readByte;
             charPos++;
             if(prevByte == 0x0D && readByte == 0x0A) break;
@@ -189,8 +187,6 @@ bool Mercury::readBinMsg(){
 
 
 
-bool Mercury::getSoftwareVersion(char* buffer){
-}
 
 
 
@@ -342,7 +338,7 @@ void Mercury::mapMsgToPayloadLength(int msgId){
 unsigned int Mercury::calcChecksum(){
     unsigned int checksum = 0;
     for (int i = 0; i < payloadLength; i++) {
-        checksum ^= payload[i];
+        checksum ^= binaryMsg[i];
     }
     return checksum;
 }
@@ -353,7 +349,7 @@ unsigned int Mercury::calcChecksum(){
 
 
 void Mercury::getResponse(char *buffer){
-    for (int i = 0; i < responseSize; i++) {
-        buffer[i] = response[i];
+    for (int i = 0; i < binaryBufferMsgSize; i++) {
+        buffer[i] = binaryMsg[i];
     }
 }
