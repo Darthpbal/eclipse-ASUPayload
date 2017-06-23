@@ -55,7 +55,7 @@ public:
 
     bool readLine();
     void getLine(char* buffer);             //fills the buffer with the last sentence seen
-    int geLineSize();
+    int getLineSize();
 
     void getField(char* buffer, int index);     //fills the buffer with whatever desired index
 
