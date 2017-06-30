@@ -58,7 +58,7 @@ Where:
 
 //determines how printing is handled for launch debug and graphing contexts
 enum configuration { launch, debug, plot };
-const configuration mode = debug;
+const configuration mode = launch;
 char delim;  //the seperator that will be printed to seperate all values.
 
 
@@ -178,9 +178,9 @@ void setup() {
 
 
     Serial.print(F("mode = "));
-    if(mode == launch)  Serial.println(F("launch"));
-    else if(mode == debug)  Serial.println(F("debug"));
-    else if(mode == plot)   Serial.println(F("plot"));
+    if(mode == launch)  Serial.println(F("\nlaunch"));
+    else if(mode == debug)  Serial.println(F("\ndebug"));
+    else if(mode == plot)   Serial.println(F("\nplot"));
 
     //set delimiter type
     if(mode == plot) delim = '\t';
