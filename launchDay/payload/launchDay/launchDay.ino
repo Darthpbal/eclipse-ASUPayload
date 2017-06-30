@@ -56,25 +56,73 @@ Where:
 ////////////////////////////////////////////////////////////////////////////////
 
 
+//determines how printing is handled for launch debug and graphing contexts
+enum configuration { launch, debug, plot };
+const configuration mode = debug;
+char delim;  //the seperator that will be printed to seperate all values.
 
 
+
+
+
+// #include "Mercury.h"
+// #include <SoftwareSerial.h>
 #include <Wire.h>               //I2C class
 #include <SPI.h>                //SPI class
 #include <SD.h>                 //sd card file access class
 
 
 
+
+// 9DOF
+#include <Adafruit_Sensor.h>
+#include "Mahony.h"
+#include "Madgwick.h"
+#include "Adafruit_FXAS21002C.h"
+#include "Adafruit_FXOS8700.h"
+
+Adafruit_FXAS21002C gyro = Adafruit_FXAS21002C(0x0021002C);
+Adafruit_FXOS8700 accelmag = Adafruit_FXOS8700(0x8700A, 0x8700B);
+
+
+float mag_offsets[3]            = { 0.93F, -7.47F, -35.23F };
+float mag_softiron_matrix[3][3] = { {  0.943,  0.011,  0.020 },
+                                    {  0.022,  0.918, -0.008 },
+                                    {  0.020, -0.008,  1.156 } };
+float mag_field_strength        = 50.23F;
+float gyro_zero_offsets[3]      = { 0.0F, 0.0F, 0.0F };
+Mahony filter;
+// end 9DOF
+
+
+
+// thermocouple
+#include "Adafruit_MAX31865.h"
+Adafruit_MAX31865 max = Adafruit_MAX31865(4, 5, 6, 7);
+#define RREF 430.0
+// end thermocouple
+
+
+
+
+// uv sensor
+// #include "Adafruit_SI1145.h"
+// Adafruit_SI1145 uv = Adafruit_SI1145();
+//end uv sensor
+
+
+
 // #include "Adafruit_ADS1015.h"   //12 bit adc class
 
 // start GPS
-#include "Mercury.h"
-Mercury venus(); //connected to serial1,
+// SoftwareSerial venusSerial(2, 3);
+// Mercury venus(&venusSerial); //connected to serial1,
 // end GPS
 
 
 //altimeter
-#include "Adafruit_MPL3115A2.h"    // altimeter
-Adafruit_MPL3115A2 altimeter = Adafruit_MPL3115A2();
+// #include "Adafruit_MPL3115A2.h"    // altimeter
+// Adafruit_MPL3115A2 altimeter = Adafruit_MPL3115A2();
 //end altimeter
 
 
@@ -89,10 +137,6 @@ DHT dht(DHTPIN, DHTTYPE);
 
 
 
-//determines how printing is handled for launch debug and graphing contexts
-enum configuration { launch, debug, plot };
-const configuration mode = launch;
-char delim;  //the seperator that will be printed to seperate all values.
 
 
 
@@ -147,11 +191,47 @@ void setup() {
     if(mode == launch) initializeCard();
     //end uSd Card
 
+    // uv sensor
+    // if (! uv.begin()) {
+    //   Serial.println("Didn't find uv sensor");
+    //   while (1);
+    // }
+    // end uv sensor
+
     //humidity sensor
-    dht.begin();
+   dht.begin();
+
+   // thermocouple
+   max.begin(MAX31865_3WIRE);  // set to 2WIRE or 4WIRE as necessary
+
 
     //gps
-    venus.begin(9600);
+    // venus.begin(9600);
+
+
+
+
+
+
+    // 9DOF
+    if(!gyro.begin())
+    {
+      /* There was a problem detecting the gyro ... check your connections */
+      Serial.println("Ooops, no gyro detected ... Check your wiring!");
+      while(1);
+    }
+    if(!accelmag.begin(ACCEL_RANGE_4G))
+    {
+      Serial.println("Ooops, no FXOS8700 detected ... Check your wiring!");
+      while(1);
+    }
+    filter.begin(10);
+    // end 9DOF
+
+
+
+
+
 
 
     /*
@@ -164,23 +244,42 @@ void setup() {
     */
     String header = ""; //create header variable
 
-    header += "pascals(absPres),";
-    header += "atmospheres(absPres),";
-    header += "altitudeMeters(absPres),";
-    header += "tempC(absPres),";
+    // header += "pascals(absPres),";
+    // header += "atmospheres(absPres),";
+    // header += "altitudeMeters(absPres),";
+    // header += "tempC(absPres),";
 
     header += "humidity%(dht22),";
     header += "tempF(dht22),";
     header += "heatIndxF(dht22),";
 
-    header += "latitude(gps),";
-    header += "longitude(gps),";
-    header += "altitudeMeters(gps),";
-    header += "fixQuality(gps),";
-    header += "posDilution(gps),";
-    header += "geoidHeightMeters(gps),";
-    header += "numSatsTracked(gps),";
-    header += "fixTime(gps),";
+    // header += "visible(adaUV),";
+    // header += "IR(adaUV),";
+    // header += "UVIndx(adaUV),";
+
+    header += "tempF(thermocouple),";
+
+    header += "accelXG(9DOF),";
+    header += "accelYG(9DOF),";
+    header += "accelZG(9DOF),";
+    header += "gyroXdegPerSec(9DOF),";
+    header += "gyroYdegPerSec(9DOF),";
+    header += "gyroZdegPerSec(9DOF),";
+    header += "magXuTesla(9DOF),";
+    header += "magYuTesla(9DOF),";
+    header += "magZuTesla(9DOF),";
+    header += "roll(9DOF),";
+    header += "pitch(9DOF),";
+    header += "heading(9DOF),";
+
+    // header += "latitude(gps),";
+    // header += "longitude(gps),";
+    // header += "altitudeMeters(gps),";
+    // header += "fixQuality(gps),";
+    // header += "posDilution(gps),";
+    // header += "geoidHeightMeters(gps),";
+    // header += "numSatsTracked(gps),";
+    // header += "fixTime(gps),";
 
 
     header += "millis\n";
@@ -232,19 +331,19 @@ void loop() {
 
 
     //altimeter
-    float pascals = altimeter.getPressure();
-    logLine += pascals;
-    logLine += delim;
-
-    logLine += pascals / 101325;
-    logLine += delim;
-
-    logLine = altimeter.getAltitude();
-    logLine += delim;
-
-    // logLine = altimeter.getTemperature(); // in celcius
-    logLine = ( ( 9 * altimeter.getTemperature() ) / 5) + 32; // in fahrenheight
-    logLine += delim;
+    // float pascals = altimeter.getPressure();
+    // logLine += pascals;
+    // logLine += delim;
+    //
+    // logLine += pascals / 101325;
+    // logLine += delim;
+    //
+    // logLine = altimeter.getAltitude();
+    // logLine += delim;
+    //
+    // // logLine = altimeter.getTemperature(); // in celcius
+    // logLine = ( ( 9 * altimeter.getTemperature() ) / 5) + 32; // in fahrenheight
+    // logLine += delim;
     //end altimeter
 
 
@@ -253,8 +352,8 @@ void loop() {
 
 
     //start dht22
-    float humidity = dht.readHumidity(); //get humitidy percentage
-    float tempF = dht.readTemperature(true); //read temp in fahrenheight
+   float humidity = dht.readHumidity(); //get humitidy percentage
+   float tempF = dht.readTemperature(true); //read temp in fahrenheight
 
     // Check if any reads failed and exit early (to try again).
     if ( isnan(humidity) || isnan(tempF) ) {
@@ -266,17 +365,25 @@ void loop() {
       logLine += delim;
     }
     else {
-        logLine += humidity
+        logLine += humidity;
         logLine += delim;
         logLine += tempF;
         logLine += delim;
-        logLine += dht.computeHeatIndex(tempF, humidity);
+       logLine += dht.computeHeatIndex(tempF, humidity);
         logLine += delim;
     }
 
     //end dht22
 
 
+    // uv sensor
+    // logLine += uv.readVisible();
+    // logLine += delim;
+    // logLine += uv.readIR();
+    // logLine += delim;
+    // logLine += uv.readUV() / 100.0;
+    // logLine += delim;
+    // end uv sensor
 
 
 
@@ -284,11 +391,83 @@ void loop() {
 
 
 
+    // thermocouple sensor
+    float thermocoupleTemp = max.temperature(100, RREF);
+    uint8_t fault = max.readFault();
+    if(fault) {
+        logLine += "fault 0x";
+        logLine += fault;
+        logLine += delim;
+        max.clearFault();
+    }
+    else {
+        logLine += ( (thermocoupleTemp * 9) / 5) + 32;
+        logLine += delim;
+    }
+    // end thermocouple sensor
 
 
 
 
 
+
+    // 9DOF
+    sensors_event_t gyro_event;
+    sensors_event_t accel_event;
+    sensors_event_t mag_event;
+
+    gyro.getEvent(&gyro_event);
+    accelmag.getEvent(&accel_event, &mag_event);
+
+    float x = mag_event.magnetic.x - mag_offsets[0];
+    float y = mag_event.magnetic.y - mag_offsets[1];
+    float z = mag_event.magnetic.z - mag_offsets[2];
+    float mx = x * mag_softiron_matrix[0][0] + y * mag_softiron_matrix[0][1] + z * mag_softiron_matrix[0][2];
+    float my = x * mag_softiron_matrix[1][0] + y * mag_softiron_matrix[1][1] + z * mag_softiron_matrix[1][2];
+    float mz = x * mag_softiron_matrix[2][0] + y * mag_softiron_matrix[2][1] + z * mag_softiron_matrix[2][2];
+    float gx = gyro_event.gyro.x + gyro_zero_offsets[0];
+    float gy = gyro_event.gyro.y + gyro_zero_offsets[1];
+    float gz = gyro_event.gyro.z + gyro_zero_offsets[2];
+    gx *= 57.2958F;
+    gy *= 57.2958F;
+    gz *= 57.2958F;
+
+    float ax = accel_event.acceleration.x;
+    float ay = accel_event.acceleration.y;
+    float az = accel_event.acceleration.z;
+
+    filter.update(gx, gy, gz,
+                  ax, ay, az,
+                  mx, my, mz);
+
+    logLine += ax;
+    logLine += delim;
+    logLine += ay;
+    logLine += delim;
+    logLine += az;
+    logLine += delim;
+
+    logLine += gx;
+    logLine += delim;
+    logLine += gy;
+    logLine += delim;
+    logLine += gz;
+    logLine += delim;
+
+    logLine += mx;
+    logLine += delim;
+    logLine += my;
+    logLine += delim;
+    logLine += mz;
+    logLine += delim;
+
+    logLine += filter.getRoll();
+    logLine += delim;
+    logLine += filter.getPitch();
+    logLine += delim;
+    logLine += filter.getYaw();
+    logLine += delim;
+    // end 9DOF
 
 
 
@@ -298,46 +477,46 @@ void loop() {
     //start gps
     // check the GPS field explaination
     // to see the field numbers
-    char gpsData[20];
-
-    venus.setRunMode(filtered);
-    venus.setGpsTag("GPGGA");
-    venus.readLine();
-
-    venus.getField(gpsData, 2);  // latitude(gps)
-    logLine += gpsData;
-    logLine += delim;
-
-    venus.getField(gpsData, 5);  // longitude eastwest
-    if(gpsData[0] == 'W') logLine += '-';
-
-    venus.getField(gpsData, 4);  // longitude(gps)
-    logLine += gpsData;
-    logLine += delim;
-
-    venus.getField(gpsData, 9);  // altitudeMeters(gps)
-    logLine += gpsData;
-    logLine += delim;
-
-    venus.getField(gpsData, 6);  // fixQuality(gps)
-    logLine += gpsData;
-    logLine += delim;
-
-    venus.getField(gpsData, 8);  // posDilution(gps)
-    logLine += gpsData;
-    logLine += delim;
-
-    venus.getField(gpsData, 11);  // geoidHeightMeters(gps)
-    logLine += gpsData;
-    logLine += delim;
-
-    venus.getField(gpsData, 7);  // numSatsTracked(gps)
-    logLine += gpsData;
-    logLine += delim;
-
-    venus.getField(gpsData, 1);  // fixTime(gps)
-    logLine += gpsData;
-    logLine += delim;
+    // char gpsData[20];
+    //
+    // venus.setRunMode(filtered);
+    // venus.setGpsTag("GPGGA");
+    // venus.readLine();
+    //
+    // venus.getField(gpsData, 2);  // latitude(gps)
+    // logLine += gpsData;
+    // logLine += delim;
+    //
+    // venus.getField(gpsData, 5);  // longitude eastwest
+    // if(gpsData[0] == 'W') logLine += '-';
+    //
+    // venus.getField(gpsData, 4);  // longitude(gps)
+    // logLine += gpsData;
+    // logLine += delim;
+    //
+    // venus.getField(gpsData, 9);  // altitudeMeters(gps)
+    // logLine += gpsData;
+    // logLine += delim;
+    //
+    // venus.getField(gpsData, 6);  // fixQuality(gps)
+    // logLine += gpsData;
+    // logLine += delim;
+    //
+    // venus.getField(gpsData, 8);  // posDilution(gps)
+    // logLine += gpsData;
+    // logLine += delim;
+    //
+    // venus.getField(gpsData, 11);  // geoidHeightMeters(gps)
+    // logLine += gpsData;
+    // logLine += delim;
+    //
+    // venus.getField(gpsData, 7);  // numSatsTracked(gps)
+    // logLine += gpsData;
+    // logLine += delim;
+    //
+    // venus.getField(gpsData, 1);  // fixTime(gps)
+    // logLine += gpsData;
+    // logLine += delim;
 
     //end gps
 
@@ -355,7 +534,7 @@ void loop() {
     else if(mode == plot) Serial.print(logLine);
     else if(mode == launch) lineLogger(logLine);
 
-    delay(150);     //for sanity
+    delay(20);     //for sanity
 }// end of loop
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,65 +1,65 @@
 /**************************************************************************/
 /*!
-    @file     Adafruit_MPL3115A2.h
-    @author   K. Townsend (Adafruit Industries)
-    @license  BSD (see license.txt)
+   @file     Adafruit_MPL3115A2.h
+   @author   K. Townsend (Adafruit Industries)
+   @license  BSD (see license.txt)
 
-    This is a library for the Adafruit MPL3115A2 breakout board
-    ----> https://www.adafruit.com/products/1893
+   This is a library for the Adafruit MPL3115A2 breakout board
+   ----> https://www.adafruit.com/products/1893
 
-    Adafruit invests time and resources providing this open source code,
-    please support Adafruit and open-source hardware by purchasing
-    products from Adafruit!
+   Adafruit invests time and resources providing this open source code,
+   please support Adafruit and open-source hardware by purchasing
+   products from Adafruit!
 
-    @section  HISTORY
+   @section  HISTORY
 
-    v1.0  - First release
+   v1.0  - First release
 */
 /**************************************************************************/
 
 #if ARDUINO >= 100
- #include "Arduino.h"
+#include "Arduino.h"
 #else
- #include "WProgram.h"
+#include "WProgram.h"
 #endif
 
 #ifdef __AVR_ATtiny85__
- #include <TinyWireM.h>
+#include <TinyWireM.h>
 #else
- #include <Wire.h>
+#include <Wire.h>
 #endif
 
 /*=========================================================================
-    I2C ADDRESS/BITS
-    -----------------------------------------------------------------------*/
-    #define MPL3115A2_ADDRESS                       (0x60)    // 1100000
+   I2C ADDRESS/BITS
+   -----------------------------------------------------------------------*/
+   #define MPL3115A2_ADDRESS                       (0x60)    // 1100000
 /*=========================================================================*/
 
 /*=========================================================================
-    REGISTERS
-    -----------------------------------------------------------------------*/
-    #define MPL3115A2_REGISTER_STATUS               (0x00)
-    #define MPL3115A2_REGISTER_STATUS_TDR 0x02
-    #define MPL3115A2_REGISTER_STATUS_PDR 0x04
-    #define MPL3115A2_REGISTER_STATUS_PTDR 0x08
+   REGISTERS
+   -----------------------------------------------------------------------*/
+   #define MPL3115A2_REGISTER_STATUS               (0x00)
+   #define MPL3115A2_REGISTER_STATUS_TDR 0x02
+   #define MPL3115A2_REGISTER_STATUS_PDR 0x04
+   #define MPL3115A2_REGISTER_STATUS_PTDR 0x08
 
-    #define MPL3115A2_REGISTER_PRESSURE_MSB         (0x01)
-    #define MPL3115A2_REGISTER_PRESSURE_CSB         (0x02)
-    #define MPL3115A2_REGISTER_PRESSURE_LSB         (0x03)
+   #define MPL3115A2_REGISTER_PRESSURE_MSB         (0x01)
+   #define MPL3115A2_REGISTER_PRESSURE_CSB         (0x02)
+   #define MPL3115A2_REGISTER_PRESSURE_LSB         (0x03)
 
-    #define MPL3115A2_REGISTER_TEMP_MSB             (0x04)
-    #define MPL3115A2_REGISTER_TEMP_LSB             (0x05)
+   #define MPL3115A2_REGISTER_TEMP_MSB             (0x04)
+   #define MPL3115A2_REGISTER_TEMP_LSB             (0x05)
 
-    #define MPL3115A2_REGISTER_DR_STATUS            (0x06)
+   #define MPL3115A2_REGISTER_DR_STATUS            (0x06)
 
-    #define MPL3115A2_OUT_P_DELTA_MSB               (0x07)
-    #define MPL3115A2_OUT_P_DELTA_CSB               (0x08)
-    #define MPL3115A2_OUT_P_DELTA_LSB               (0x09)
+   #define MPL3115A2_OUT_P_DELTA_MSB               (0x07)
+   #define MPL3115A2_OUT_P_DELTA_CSB               (0x08)
+   #define MPL3115A2_OUT_P_DELTA_LSB               (0x09)
 
-    #define MPL3115A2_OUT_T_DELTA_MSB               (0x0A)
-    #define MPL3115A2_OUT_T_DELTA_LSB               (0x0B)
+   #define MPL3115A2_OUT_T_DELTA_MSB               (0x0A)
+   #define MPL3115A2_OUT_T_DELTA_LSB               (0x0B)
 
-    #define MPL3115A2_WHOAMI                        (0x0C)
+   #define MPL3115A2_WHOAMI                        (0x0C)
 
 #define MPL3115A2_PT_DATA_CFG 0x13
 #define MPL3115A2_PT_DATA_CFG_TDEFE 0x01
@@ -86,21 +86,21 @@
 #define MPL3115A2_CTRL_REG4                     (0x29)
 #define MPL3115A2_CTRL_REG5                     (0x2A)
 
-    #define MPL3115A2_REGISTER_STARTCONVERSION      (0x12)
+   #define MPL3115A2_REGISTER_STARTCONVERSION      (0x12)
 /*=========================================================================*/
 
 class Adafruit_MPL3115A2{
- public:
-  Adafruit_MPL3115A2();
-  boolean begin(void);
-  float getPressure(void);
-  float getAltitude(void);
-  float getTemperature(void);
+public:
+ Adafruit_MPL3115A2();
+ boolean begin(void);
+ float getPressure(void);
+ float getAltitude(void);
+ float getTemperature(void);
 
-  void write8(uint8_t a, uint8_t d);
+ void write8(uint8_t a, uint8_t d);
 
- private:
-  uint8_t read8(uint8_t a);
-  uint8_t mode;
+private:
+ uint8_t read8(uint8_t a);
+ uint8_t mode;
 
 };

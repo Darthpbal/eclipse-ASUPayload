@@ -13,12 +13,12 @@ private:
     int charPos;
     const static int sentenceSize = 100,
                         gpsTagSize = 10,
-                        binaryBufferMsgSize = 50;
+                        payloadSize = 20,
+                        responseSize = 20;
 
     //Here's some default settings a user may want to change.
     runMode mode;     //determines if all data will be printed, or only
                             //lines matching the desired gps tag
-
     char gpsTag[gpsTagSize];     //desired gps tag
     char readChar;
     char sentenceFlag;
@@ -27,9 +27,9 @@ private:
     bool saveMode;
 
 
+    byte payload[payloadSize];
+    byte response[responseSize];
     unsigned int payloadLength;
-    byte readByte, prevByte;
-
     byte msgStartFlag[2] = {0xA0, 0xA1},
     msgEndFlag[2] = {0x0D, 0x0A};
 
@@ -39,21 +39,18 @@ private:
     void readFilteredLine();
     void readRawLine();
     void clearLine();                       //read a normal gps sentence
-    bool readBinMsg();
 
 
 
 public:
-    byte binaryMsg[binaryBufferMsgSize];
     char sentence[sentenceSize];    // I think i like the sentence as a public member, since the obligation to create another c string to retreive data from the library is redundant and annoying.
-
     Mercury ();            //ctor, sets the member software serial pointer to the ctor argument
     void begin(int baud);                       //set software serial port baud rate
     void setRunMode(runMode newMode);              //set whether or not to filter incoming data
 
     bool readLine();
     void getLine(char* buffer);             //fills the buffer with the last sentence seen
-    int getLineSize();
+    int geLineSize();
 
     void getField(char* buffer, int index);     //fills the buffer with whatever desired index
 

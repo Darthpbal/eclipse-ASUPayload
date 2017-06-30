@@ -2,12 +2,11 @@
 
 
 
-//responseSize
+
 
 
 
 Mercury::Mercury (){
-
     //library settings
     sentenceFlag = '$';
     setRunMode(raw);
@@ -57,7 +56,7 @@ void Mercury::readRawLine(){
 
 
 
-int Mercury::getLineSize(){
+int Mercury::geLineSize(){
     return charPos;
 }
 
@@ -141,52 +140,7 @@ void Mercury::getField(char* buffer, int index){
 
 
 bool Mercury::getSoftwareVersion(char* buffer){
-    memset(binaryMsg, 0x0, binaryBufferMsgSize);
-    binaryMsg[0] = msgStartFlag[0];
-    binaryMsg[1] = msgStartFlag[1];
 }
-
-
-
-bool Mercury::readBinMsg(){
-    memset(binaryMsg, 0x0, binaryBufferMsgSize);
-
-    tagDetected = false;
-    do{
-      while(Serial1.available() == 0);
-      readByte = Serial1.read();
-      if(prevByte == 0xA0 && readByte == 0xA1) break;
-      else prevByte = readByte;
-    }
-    while(tagDetected == false);
-
-    binaryMsg[0] = prevByte;
-    binaryMsg[1] = readByte;
-
-
-    tagDetected = false;
-    charPos = 2;
-
-    do{
-        do{
-            while(Serial1.available() == 0);
-            readByte = Serial1.read();
-            binaryMsg[charPos] = readByte;
-            charPos++;
-            if(prevByte == 0x0D && readByte == 0x0A) break;
-            else {
-              prevByte = readByte;
-            }
-        }
-        while( (charPos < binaryBufferMsgSize) );
-        tagDetected = true;
-    }
-    while(tagDetected == false);
-
-}
-
-
-
 
 
 
@@ -338,18 +292,20 @@ void Mercury::mapMsgToPayloadLength(int msgId){
 unsigned int Mercury::calcChecksum(){
     unsigned int checksum = 0;
     for (int i = 0; i < payloadLength; i++) {
-        checksum ^= binaryMsg[i];
+        checksum ^= payload[i];
     }
     return checksum;
 }
 
 
 
+bool Mercury::readResponse(){
+}
 
 
 
 void Mercury::getResponse(char *buffer){
-    for (int i = 0; i < binaryBufferMsgSize; i++) {
-        buffer[i] = binaryMsg[i];
+    for (int i = 0; i < responseSize; i++) {
+        buffer[i] = response[i];
     }
 }
