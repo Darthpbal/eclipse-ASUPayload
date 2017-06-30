@@ -176,9 +176,9 @@ void setup() {
     Serial.begin(9600);
     while (!Serial);  // Wait for serial port to connect (ATmega32U4 type PCBAs)
 
-
-    Serial.print(F("mode = "));
-    if(mode == launch)  Serial.println(F("\nlaunch"));
+    delay(100);
+    Serial.print(F("\nmode = "));
+    if(mode == launch)  Serial.println(F("launch"));
     else if(mode == debug)  Serial.println(F("\ndebug"));
     else if(mode == plot)   Serial.println(F("\nplot"));
 
