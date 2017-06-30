@@ -3,10 +3,14 @@
 #define Mercury_h
 
 #include "Arduino.h"
-#include <SoftwareSerial.h>
+
+#ifdef _VARIANT_ARDUINO_DUE_X_
+#else
+    #include <SoftwareSerial.h>
+#endif
 
 
-//typedef enum runMode = {r/aw, filtered};
+
 typedef enum { raw, filtered } runMode;
 
 class Mercury {
@@ -14,12 +18,12 @@ private:
     int charPos;
     const static int sentenceSize = 100,
                         gpsTagSize = 10,
-                        binaryBufferMsgSize = 50;
+                        payloadSize = 20,
+                        responseSize = 20;
 
     //Here's some default settings a user may want to change.
     runMode mode;     //determines if all data will be printed, or only
                             //lines matching the desired gps tag
-
     char gpsTag[gpsTagSize];     //desired gps tag
     char readChar;
     char sentenceFlag;
@@ -27,10 +31,22 @@ private:
     unsigned int timeout;    //controls how long the board waits for a gps tag before a timing out
     bool saveMode;
 
-    SoftwareSerial *serialPort;
 
+    byte payload[payloadSize];
+    byte response[responseSize];
     unsigned int payloadLength;
-    byte readByte, prevByte;
+
+
+
+    #ifdef _VARIANT_ARDUINO_DUE_X_
+        HardwareSerial * serialPort;
+    #else
+        SoftwareSerial *serialPort;
+    #endif
+
+
+
+
 
     byte msgStartFlag[2] = {0xA0, 0xA1},
     msgEndFlag[2] = {0x0D, 0x0A};
@@ -41,21 +57,24 @@ private:
     void readFilteredLine();
     void readRawLine();
     void clearLine();                       //read a normal gps sentence
-    bool readBinMsg();
 
 
 
 public:
-    byte binaryMsg[binaryBufferMsgSize];
     char sentence[sentenceSize];    // I think i like the sentence as a public member, since the obligation to create another c string to retreive data from the library is redundant and annoying.
 
-    Mercury (SoftwareSerial *serial);            //ctor, sets the member software serial pointer to the ctor argument
+    #ifdef _VARIANT_ARDUINO_DUE_X_
+        Mercury (HardwareSerial *serial);            //ctor, sets the member software serial pointer to the ctor argument
+    #else
+        Mercury (SoftwareSerial *serial);            //ctor, sets the member software serial pointer to the ctor argument
+    #endif
+
     void begin(int baud);                       //set software serial port baud rate
     void setRunMode(runMode newMode);              //set whether or not to filter incoming data
 
     bool readLine();
     void getLine(char* buffer);             //fills the buffer with the last sentence seen
-    int getLineSize();
+    int geLineSize();
 
     void getField(char* buffer, int index);     //fills the buffer with whatever desired index
 
@@ -85,7 +104,7 @@ public:
     bool setWaas(bool enable);                  //I don't really know what WAAS is, but it's easy to configure and sounded like it could be a useful setting
     bool getWaas(char* buffer);                 //fills the buffer with the WAAS status
 
-    bool setSaveMode(bool permanent = false);   //sets whether or not configuration of the gps is permanent. I recommend against unless you know you won't break the board.
+    bool setSaveMode(bool permanent);   //sets whether or not configuration of the gps is permanent. I recommend against unless you know you won't break the board.
     bool getSaveMode();                         //returns the saveMode member variable, in case you need it
 
     bool setPositionPinning(bool enable);       //configures position pinning

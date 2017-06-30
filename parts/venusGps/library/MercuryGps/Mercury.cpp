@@ -1,23 +1,37 @@
 #include "Mercury.h"
-#include <SoftwareSerial.h>
+
+
+
+#ifdef _VARIANT_ARDUINO_DUE_X_
+    Mercury::Mercury (HardwareSerial *serial){
+        serialPort = serial;
+
+        //library settings
+        sentenceFlag = '$';
+        setRunMode(raw);
+        setGpsTag("GPGGA");
+        setTimeout(5000);
+        setSaveMode(false);
+        clearLine();
+    }
+#else
+    #include <SoftwareSerial.h>
+    Mercury::Mercury (SoftwareSerial *serial){
+        serialPort = serial;
+
+        //library settings
+        sentenceFlag = '$';
+        setRunMode(raw);
+        setGpsTag("GPGGA");
+        setTimeout(5000);
+        setSaveMode(false);
+        clearLine();
+    }
+#endif
 
 
 
 
-
-
-
-Mercury::Mercury (SoftwareSerial *serial){
-    serialPort = serial;
-
-    //library settings
-    sentenceFlag = '$';
-    setRunMode(raw);
-    setGpsTag("GPGGA");
-    setTimeout(5000);
-    setSaveMode(false);
-    clearLine();
-}
 
 
 
@@ -59,7 +73,7 @@ void Mercury::readRawLine(){
 
 
 
-int Mercury::getLineSize(){
+int Mercury::geLineSize(){
     return charPos;
 }
 
@@ -138,53 +152,6 @@ void Mercury::getField(char* buffer, int index){
         sentencePos ++;
     }
     buffer[fieldPos] = '\0';
-}
-
-
-
-bool Mercury::getSoftwareVersion(char* buffer){
-    memset(binaryMsg, 0x0, binaryBufferMsgSize);
-    binaryMsg[0] = msgStartFlag[0];
-    binaryMsg[1] = msgStartFlag[1];
-}
-
-
-
-bool Mercury::readBinMsg(){
-    memset(binaryMsg, 0x0, binaryBufferMsgSize);
-
-    tagDetected = false;
-    do{
-      while(serialPort->available() == 0);
-      readByte = serialPort->read();
-      if(prevByte == 0xA0 && readByte == 0xA1) break;
-      else prevByte = readByte;
-    }
-    while(tagDetected == false);
-
-    binaryMsg[0] = prevByte;
-    binaryMsg[1] = readByte;
-
-
-    tagDetected = false;
-    charPos = 2;
-
-    do{
-        do{
-            while(serialPort->available() == 0);
-            readByte = serialPort->read();
-            binaryMsg[charPos] = readByte;
-            charPos++;
-            if(prevByte == 0x0D && readByte == 0x0A) break;
-            else {
-              prevByte = readByte;
-            }
-        }
-        while( (charPos < binaryBufferMsgSize) );
-        tagDetected = true;
-    }
-    while(tagDetected == false);
-
 }
 
 
@@ -349,6 +316,8 @@ unsigned int Mercury::calcChecksum(){
 
 
 
+bool Mercury::readResponse(){
+}
 
 
 

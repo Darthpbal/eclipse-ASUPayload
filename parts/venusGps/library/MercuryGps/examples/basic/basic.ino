@@ -8,11 +8,15 @@ port monitor to just echo that data to the arduino ide serial monitor.
 
 
 
-#include "Mercury.h"             //include the library
-#include <SoftwareSerial.h>     //include SoftwareSerial
+#include <Mercury.h>             //include the library
 
-SoftwareSerial venusSerial(10,11);  // setup pin 10 and 11 as rx and tx for a software serial port.
-Mercury venus(&venusSerial);         // declare an instance of the library, passing the software serial object to the Mercury constructor.
+#ifdef _VARIANT_ARDUINO_DUE_X_
+    Mercury venus(&Serial1);         // declare an instance of the library, passing the software serial object to the Mercury constructor.
+#else
+    #include <SoftwareSerial.h>     //include SoftwareSerial
+    SoftwareSerial venusSerial(10,11);  // setup pin 10 and 11 as rx and tx for a software serial port.
+    Mercury venus(&venusSerial);         // declare an instance of the library, passing the software serial object to the Mercury constructor.
+#endif
 
 
 void setup() {
