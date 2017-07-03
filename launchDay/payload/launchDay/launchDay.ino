@@ -58,15 +58,13 @@ Where:
 
 //determines how printing is handled for launch debug and graphing contexts
 enum configuration { launch, debug, plot };
-const configuration mode = launch;
+const configuration mode = debug;
 char delim;  //the seperator that will be printed to seperate all values.
 
 
 
 
 
-// #include "Mercury.h"
-// #include <SoftwareSerial.h>
 #include <Wire.h>               //I2C class
 #include <SPI.h>                //SPI class
 #include <SD.h>                 //sd card file access class
@@ -115,9 +113,15 @@ Adafruit_MAX31865 max = Adafruit_MAX31865(4, 5, 6, 7);
 // #include "Adafruit_ADS1015.h"   //12 bit adc class
 
 // start GPS
-// SoftwareSerial venusSerial(2, 3);
-// Mercury venus(&venusSerial); //connected to serial1,
-// end GPS
+#include "Mercury.h"             //include the library
+
+#ifdef _VARIANT_ARDUINO_DUE_X_
+    Mercury venus(&Serial1);         // declare an instance of the library, passing the software serial object to the Mercury constructor.
+#else
+    #include <SoftwareSerial.h>     //include SoftwareSerial
+    SoftwareSerial venusSerial(10,11);  // setup pin 10 and 11 as rx and tx for a software serial port.
+    Mercury venus(&venusSerial);         // declare an instance of the library, passing the software serial object to the Mercury constructor.
+#endif// end GPS
 
 
 //altimeter
@@ -177,19 +181,26 @@ void setup() {
     while (!Serial);  // Wait for serial port to connect (ATmega32U4 type PCBAs)
 
     delay(100);
-    Serial.print(F("\nmode = "));
+    Serial.println(("Starting up..."));
+    Serial.print(F("mode = "));
     if(mode == launch)  Serial.println(F("launch"));
     else if(mode == debug)  Serial.println(F("\ndebug"));
     else if(mode == plot)   Serial.println(F("\nplot"));
+
+
 
     //set delimiter type
     if(mode == plot) delim = '\t';
     else delim = ',';
 
+
+
     //uSd Card
     pinMode(cardDetect, INPUT);
     if(mode == launch) initializeCard();
     //end uSd Card
+
+
 
     // uv sensor
     // if (! uv.begin()) {
@@ -198,15 +209,23 @@ void setup() {
     // }
     // end uv sensor
 
+
+
     //humidity sensor
    dht.begin();
+
+
 
    // thermocouple
    max.begin(MAX31865_3WIRE);  // set to 2WIRE or 4WIRE as necessary
 
 
+
+
     //gps
-    // venus.begin(9600);
+    venus.begin(9600);
+    venus.setRunMode(filtered);
+    venus.setGpsTag("GPGGA");
 
 
 
@@ -218,13 +237,15 @@ void setup() {
     {
       /* There was a problem detecting the gyro ... check your connections */
       Serial.println("Ooops, no gyro detected ... Check your wiring!");
-      while(1);
+      if(mode == debug) while(1);
     }
     if(!accelmag.begin(ACCEL_RANGE_4G))
     {
       Serial.println("Ooops, no FXOS8700 detected ... Check your wiring!");
-      while(1);
+      if(mode == debug) while(1);
     }
+    // Filter expects 70 samples per second
+    // Based on a Bluefruit M0 Feather ... rate should be adjuted for other MCUs
     filter.begin(10);
     // end 9DOF
 
@@ -272,17 +293,20 @@ void setup() {
     header += "pitch(9DOF),";
     header += "heading(9DOF),";
 
-    // header += "latitude(gps),";
-    // header += "longitude(gps),";
-    // header += "altitudeMeters(gps),";
-    // header += "fixQuality(gps),";
-    // header += "posDilution(gps),";
-    // header += "geoidHeightMeters(gps),";
-    // header += "numSatsTracked(gps),";
-    // header += "fixTime(gps),";
+    header += "latitude(gps),";
+    header += "longitude(gps),";
+    header += "altitudeMeters(gps),";
+    header += "fixQuality(gps),";
+    header += "posDilution(gps),";
+    header += "geoidHeightMeters(gps),";
+    header += "numSatsTracked(gps),";
+    header += "fixTime(gps),";
 
 
     header += "millis\n";
+    
+    Serial.println(("Startup finished..."));
+    
     if(mode  == debug) Serial.print(header);
     else if(mode == launch) lineLogger(header);
 }//end of setup
@@ -308,6 +332,8 @@ void setup() {
 //                          Start of loop
 ////////////////////////////////////////////////////////////////////////////////
 void loop() {
+    if (mode == debug) Serial.println(F("loop start"));
+
     //SD card detection/reinitialization
     if(mode == launch){
         if (!digitalRead(cardDetect)){
@@ -372,7 +398,8 @@ void loop() {
        logLine += dht.computeHeatIndex(tempF, humidity);
         logLine += delim;
     }
-
+    Serial.print(logLine);
+    logLine.remove(0);
     //end dht22
 
 
@@ -404,6 +431,8 @@ void loop() {
         logLine += ( (thermocoupleTemp * 9) / 5) + 32;
         logLine += delim;
     }
+        Serial.print(logLine);
+    logLine.remove(0);
     // end thermocouple sensor
 
 
@@ -467,6 +496,8 @@ void loop() {
     logLine += delim;
     logLine += filter.getYaw();
     logLine += delim;
+        Serial.print(logLine);
+    logLine.remove(0);
     // end 9DOF
 
 
@@ -477,47 +508,61 @@ void loop() {
     //start gps
     // check the GPS field explaination
     // to see the field numbers
-    // char gpsData[20];
-    //
-    // venus.setRunMode(filtered);
-    // venus.setGpsTag("GPGGA");
-    // venus.readLine();
-    //
-    // venus.getField(gpsData, 2);  // latitude(gps)
-    // logLine += gpsData;
-    // logLine += delim;
-    //
-    // venus.getField(gpsData, 5);  // longitude eastwest
-    // if(gpsData[0] == 'W') logLine += '-';
-    //
-    // venus.getField(gpsData, 4);  // longitude(gps)
-    // logLine += gpsData;
-    // logLine += delim;
-    //
-    // venus.getField(gpsData, 9);  // altitudeMeters(gps)
-    // logLine += gpsData;
-    // logLine += delim;
-    //
-    // venus.getField(gpsData, 6);  // fixQuality(gps)
-    // logLine += gpsData;
-    // logLine += delim;
-    //
-    // venus.getField(gpsData, 8);  // posDilution(gps)
-    // logLine += gpsData;
-    // logLine += delim;
-    //
-    // venus.getField(gpsData, 11);  // geoidHeightMeters(gps)
-    // logLine += gpsData;
-    // logLine += delim;
-    //
-    // venus.getField(gpsData, 7);  // numSatsTracked(gps)
-    // logLine += gpsData;
-    // logLine += delim;
-    //
-    // venus.getField(gpsData, 1);  // fixTime(gps)
-    // logLine += gpsData;
-    // logLine += delim;
+    char gpsData[100] = "";
 
+    Serial.println();
+    
+    venus.readLine();
+    venus.getLine(gpsData);
+    
+    Serial.println(venus.geLineSize());
+    Serial.println(gpsData);
+    
+    
+
+    venus.getField(gpsData, 2);  // latitude(gps)
+    Serial.println(gpsData);
+//    logLine += gpsData;
+//    logLine += delim;
+
+    venus.getField(gpsData, 5);  // longitude eastwest
+    Serial.print(gpsData);
+//    if(gpsData[0] == 'W') logLine += '-';
+
+    venus.getField(gpsData, 4);  // longitude(gps)
+    Serial.println(gpsData);
+//    logLine += gpsData;
+//    logLine += delim;
+
+    venus.getField(gpsData, 9);  // altitudeMeters(gps)
+    Serial.println(gpsData);
+//    logLine += gpsData;
+//    logLine += delim;
+
+    venus.getField(gpsData, 6);  // fixQuality(gps)
+    Serial.println(gpsData);
+//    logLine += gpsData;
+//    logLine += delim;
+
+    venus.getField(gpsData, 8);  // posDilution(gps)
+    Serial.println(gpsData);
+//    logLine += gpsData;
+//    logLine += delim;
+
+    venus.getField(gpsData, 11);  // geoidHeightMeters(gps)
+    Serial.println(gpsData);
+//    logLine += gpsData;
+//    logLine += delim;
+
+    venus.getField(gpsData, 7);  // numSatsTracked(gps)
+    Serial.println(gpsData);
+//    logLine += gpsData;
+//    logLine += delim;
+
+    venus.getField(gpsData, 1);  // fixTime(gps)
+    Serial.println(gpsData);
+//    logLine += gpsData;
+//    logLine += delim;
     //end gps
 
 
@@ -535,6 +580,8 @@ void loop() {
     else if(mode == launch) lineLogger(logLine);
 
     delay(20);     //for sanity
+
+    Serial.println();
 }// end of loop
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -673,6 +720,12 @@ GAIN_SIXTEEN    16x gain  +/- 0.256V  1 bit = 0.125mV  0.0078125mV
 //         break;
 //     }
 // }
+
+
+
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////

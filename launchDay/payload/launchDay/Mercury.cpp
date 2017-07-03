@@ -2,19 +2,36 @@
 
 
 
+#ifdef _VARIANT_ARDUINO_DUE_X_
+    Mercury::Mercury (HardwareSerial *serial){
+        serialPort = serial;
+
+        //library settings
+        sentenceFlag = '$';
+        setRunMode(raw);
+        setGpsTag("GPGGA");
+        setTimeout(5000);
+        setSaveMode(false);
+        clearLine();
+    }
+#else
+    #include <SoftwareSerial.h>
+    Mercury::Mercury (SoftwareSerial *serial){
+        serialPort = serial;
+
+        //library settings
+        sentenceFlag = '$';
+        setRunMode(raw);
+        setGpsTag("GPGGA");
+        setTimeout(5000);
+        setSaveMode(false);
+        clearLine();
+    }
+#endif
 
 
 
 
-Mercury::Mercury (){
-    //library settings
-    sentenceFlag = '$';
-    setRunMode(raw);
-    setGpsTag("GPGGA");
-    setTimeout(5000);
-    setSaveMode(false);
-    clearLine();
-}
 
 
 
@@ -31,21 +48,22 @@ unsigned int Mercury::getTimeout(){
 
 
 void Mercury::begin(int baud){
-    Serial1.begin(baud);
+    serialPort->begin(baud);
 }
 
 
 
 void Mercury::readRawLine(){
+  Serial.print("raw\t");
     charPos = 0;
-    memset(sentence, '\0', 100);
-    while( readChar != '$' ) readChar = Serial1.read();
+    memset(sentence, '\0', sentenceSize);
+    while( readChar != '$' ) readChar = serialPort->read();
     sentence[charPos] = readChar;
     charPos++;
 
     do{
-        while(Serial1.available() == 0);
-        readChar = Serial1.read();
+        while(serialPort->available() == 0);
+        readChar = serialPort->read();
         sentence[charPos] = readChar;
         charPos++;
     }
@@ -63,14 +81,19 @@ int Mercury::geLineSize(){
 
 
 void Mercury::readFilteredLine(){
+    Serial.print("filter\t");
     tagDetected = false;
     do{
         readRawLine();
 
         if((strstr(sentence, gpsTag) != NULL)) tagDetected = true;
-        else tagDetected = false;
+        else {
+          tagDetected = false;
+          memset(sentence, '\0', sentenceSize);
+        }
     }
     while(tagDetected == false);
+    Serial.println();
 }
 
 

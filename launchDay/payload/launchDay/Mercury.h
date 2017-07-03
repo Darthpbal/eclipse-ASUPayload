@@ -4,8 +4,13 @@
 
 #include "Arduino.h"
 
+#ifdef _VARIANT_ARDUINO_DUE_X_
+#else
+    #include <SoftwareSerial.h>
+#endif
 
-//typedef enum runMode = {r/aw, filtered};
+
+
 typedef enum { raw, filtered } runMode;
 
 class Mercury {
@@ -30,6 +35,19 @@ private:
     byte payload[payloadSize];
     byte response[responseSize];
     unsigned int payloadLength;
+
+
+
+    #ifdef _VARIANT_ARDUINO_DUE_X_
+        HardwareSerial * serialPort;
+    #else
+        SoftwareSerial *serialPort;
+    #endif
+
+
+
+
+
     byte msgStartFlag[2] = {0xA0, 0xA1},
     msgEndFlag[2] = {0x0D, 0x0A};
 
@@ -44,7 +62,13 @@ private:
 
 public:
     char sentence[sentenceSize];    // I think i like the sentence as a public member, since the obligation to create another c string to retreive data from the library is redundant and annoying.
-    Mercury ();            //ctor, sets the member software serial pointer to the ctor argument
+
+    #ifdef _VARIANT_ARDUINO_DUE_X_
+        Mercury (HardwareSerial *serial);            //ctor, sets the member software serial pointer to the ctor argument
+    #else
+        Mercury (SoftwareSerial *serial);            //ctor, sets the member software serial pointer to the ctor argument
+    #endif
+
     void begin(int baud);                       //set software serial port baud rate
     void setRunMode(runMode newMode);              //set whether or not to filter incoming data
 
