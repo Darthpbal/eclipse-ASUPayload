@@ -126,7 +126,14 @@ void loop() {
     logLine += delim;
     //end altimeter
 
+
+
+    
+
     logLine += '\n';
+
+
+
 
     // 9DOF
     sensors_event_t gyro_event;
@@ -157,26 +164,26 @@ void loop() {
                   ax, ay, az,
                   mx, my, mz);
 
-//    logLine += ax;
-//    logLine += delim;
-//    logLine += ay;
-//    logLine += delim;
-//    logLine += az;
-//    logLine += delim;
-//
-//    logLine += gx;
-//    logLine += delim;
-//    logLine += gy;
-//    logLine += delim;
-//    logLine += gz;
-//    logLine += delim;
-//
-//    logLine += mx;
-//    logLine += delim;
-//    logLine += my;
-//    logLine += delim;
-//    logLine += mz;
-//    logLine += delim;
+    logLine += ax;
+    logLine += delim;
+    logLine += ay;
+    logLine += delim;
+    logLine += az;
+    logLine += delim;
+
+    logLine += gx;
+    logLine += delim;
+    logLine += gy;
+    logLine += delim;
+    logLine += gz;
+    logLine += delim;
+
+    logLine += mx;
+    logLine += delim;
+    logLine += my;
+    logLine += delim;
+    logLine += mz;
+    logLine += delim;
 
     logLine += filter.getRoll();
     logLine += delim;
@@ -189,6 +196,10 @@ void loop() {
     if(mode != plot){
         logLine += millis();    // timestamp
     }
+
+
+
+
 
 
     logLine += '\n';    // last character should be a newline
