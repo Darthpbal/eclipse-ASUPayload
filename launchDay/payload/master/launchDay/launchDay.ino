@@ -58,7 +58,7 @@ Where:
 
 //determines how printing is handled for launch debug and graphing contexts
 enum configuration { launch, debug, plot };
-const configuration mode = launch;
+const configuration mode = debug;
 char delim;  //the seperator that will be printed to seperate all values.
 
 
@@ -103,32 +103,19 @@ Adafruit_MAX31865 max = Adafruit_MAX31865(4, 5, 6, 7);
 
 
 
-// uv sensor
-// #include "Adafruit_SI1145.h"
-// Adafruit_SI1145 uv = Adafruit_SI1145();
-//end uv sensor
-
-
-
-// #include "Adafruit_ADS1015.h"   //12 bit adc class
-
 // start GPS
-// #include "Mercury.h"             //include the library
-//
-// #ifdef _VARIANT_ARDUINO_DUE_X_
-//     Mercury venus(&Serial1);         // declare an instance of the library, passing the software serial object to the Mercury constructor.
-// #else
-//     #include <SoftwareSerial.h>     //include SoftwareSerial
-//     SoftwareSerial venusSerial(10,11);  // setup pin 10 and 11 as rx and tx for a software serial port.
-//     Mercury venus(&venusSerial);         // declare an instance of the library, passing the software serial object to the Mercury constructor.
-// #endif
+ #include "Mercury.h"             //include the library
+
+ #ifdef _VARIANT_ARDUINO_DUE_X_
+     Mercury venus(&Serial1);         // declare an instance of the library, passing the software serial object to the Mercury constructor.
+ #else
+     #include <SoftwareSerial.h>     //include SoftwareSerial
+     SoftwareSerial venusSerial(10,11);  // setup pin 10 and 11 as rx and tx for a software serial port.
+     Mercury venus(&venusSerial);         // declare an instance of the library, passing the software serial object to the Mercury constructor.
+ #endif
 // end GPS
 
 
-//altimeter
-#include "Adafruit_MPL3115A2.h"    // altimeter
-Adafruit_MPL3115A2 altimeter = Adafruit_MPL3115A2();
-//end altimeter
 
 
 //DHT22
@@ -148,16 +135,12 @@ DHT dht(DHTPIN, DHTTYPE);
 //uSD globals
 File logFile;
 char fileName[] = "logFile.txt"; // SD library only supports up to 8.3 names
-const uint8_t chipSelect = 8;
-const uint8_t cardDetect = 9;
+const uint8_t chipSelect = 9;
+const uint8_t cardDetect = 8;
 bool alreadyBegan = false;  // SD.begin() misbehaves if not first call
 //end uSD globals
 
 
-//adc
-// Adafruit_ADS1115 adc16Bit;
-// int channelName = 0;  //uncomment this when adding analog channels to read.
-//end adc
 
 
 
@@ -203,12 +186,6 @@ void setup() {
 
 
 
-    // uv sensor
-    // if (! uv.begin()) {
-    //   Serial.println("Didn't find uv sensor");
-    //   while (1);
-    // }
-    // end uv sensor
 
 
 
@@ -224,9 +201,9 @@ void setup() {
 
 
     //gps
-//    venus.begin(9600);
-//    venus.setRunMode(filtered);
-//    venus.setGpsTag("GPGGA");
+    venus.begin(9600);
+    venus.setRunMode(filtered);
+    venus.setGpsTag("GPGGA");
 
 
 
@@ -266,10 +243,10 @@ void setup() {
     */
     String header = ""; //create header variable
 
-    header += "pascals(absPres),";
-    header += "atmospheres(absPres),";
-    header += "altitudeMeters(absPres),";
-    header += "tempC(absPres),";
+//    header += "pascals(absPres),";
+//    header += "atmospheres(absPres),";
+//    header += "altitudeMeters(absPres),";
+//    header += "tempC(absPres),";
 
     header += "humidity%(dht22),";
     header += "tempF(dht22),";
@@ -294,14 +271,14 @@ void setup() {
     header += "pitch(9DOF),";
     header += "heading(9DOF),";
 
-    // header += "latitude(gps),";
-    // header += "longitude(gps),";
-    // header += "altitudeMeters(gps),";
-    // header += "fixQuality(gps),";
-    // header += "posDilution(gps),";
-    // header += "geoidHeightMeters(gps),";
-    // header += "numSatsTracked(gps),";
-    // header += "fixTime(gps),";
+     header += "latitude(gps),";
+     header += "longitude(gps),";
+     header += "altitudeMeters(gps),";
+     header += "fixQuality(gps),";
+     header += "posDilution(gps),";
+     header += "geoidHeightMeters(gps),";
+     header += "numSatsTracked(gps),";
+     header += "fixTime(gps),";
 
 
     header += "millis\n";
@@ -358,19 +335,7 @@ void loop() {
 
 
     //altimeter
-    float pascals = altimeter.getPressure();
-    logLine += pascals;
-    logLine += delim;
-
-    logLine += pascals / 101325;
-    logLine += delim;
-
-    logLine = altimeter.getAltitude();
-    logLine += delim;
-
-    // logLine = altimeter.getTemperature(); // in celcius
-    logLine = ( ( 9 * altimeter.getTemperature() ) / 5) + 32; // in fahrenheight
-    logLine += delim;
+    // use link to arduino uno dedicated to altimeter to fetch most recent altitude/temp/etc
     //end altimeter
 
 
@@ -403,12 +368,7 @@ void loop() {
 
 
     // uv sensor
-    // logLine += uv.readVisible();
-    // logLine += delim;
-    // logLine += uv.readIR();
-    // logLine += delim;
-    // logLine += uv.readUV() / 100.0;
-    // logLine += delim;
+    // fill in with a get function accessing the i2c slave arduino uno for lum and UV sensors
     // end uv sensor
 
 
@@ -503,6 +463,9 @@ void loop() {
     //start gps
     // check the GPS field explaination
     // to see the field numbers
+//    Serial.print(logLine);
+//    logLine = "";
+//    
 //     char gpsData[100] = "";
 //
 //     Serial.println();
@@ -574,9 +537,10 @@ void loop() {
     else if(mode == plot) Serial.print(logLine);
     else if(mode == launch) lineLogger(logLine);
 
-    delay(20);     //for sanity
+    
 
-//    Serial.pri/ntln();
+    Serial.println('\n');
+    delay(3000);     //for sanity
 }// end of loop
 
 ////////////////////////////////////////////////////////////////////////////////
