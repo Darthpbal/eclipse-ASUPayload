@@ -135,8 +135,8 @@ DHT dht(DHTPIN, DHTTYPE);
 //uSD globals
 File logFile;
 char fileName[] = "logFile.txt"; // SD library only supports up to 8.3 names
-const uint8_t chipSelect = 8;
-const uint8_t cardDetect = 9;
+const uint8_t chipSelect = 9;
+const uint8_t cardDetect = 8;
 bool alreadyBegan = false;  // SD.begin() misbehaves if not first call
 //end uSD globals
 
@@ -463,64 +463,64 @@ void loop() {
     //start gps
     // check the GPS field explaination
     // to see the field numbers
-    Serial.print(logLine);
-    logLine = "";
-    
-     char gpsData[100] = "";
-
-     Serial.println();
-
-     venus.readLine();
-     venus.getLine(gpsData);
-
-     Serial.println(venus.geLineSize());
-     Serial.println(gpsData);
-
-
-
-     venus.getField(gpsData, 2);  // latitude(gps)
-     Serial.println(gpsData);
- //    logLine += gpsData;
- //    logLine += delim;
-
-     venus.getField(gpsData, 5);  // longitude eastwest
-     Serial.print(gpsData);
- //    if(gpsData[0] == 'W') logLine += '-';
-
-     venus.getField(gpsData, 4);  // longitude(gps)
-     Serial.println(gpsData);
- //    logLine += gpsData;
- //    logLine += delim;
-
-     venus.getField(gpsData, 9);  // altitudeMeters(gps)
-     Serial.println(gpsData);
- //    logLine += gpsData;
- //    logLine += delim;
-
-     venus.getField(gpsData, 6);  // fixQuality(gps)
-     Serial.println(gpsData);
- //    logLine += gpsData;
- //    logLine += delim;
-
-     venus.getField(gpsData, 8);  // posDilution(gps)
-     Serial.println(gpsData);
- //    logLine += gpsData;
- //    logLine += delim;
-
-     venus.getField(gpsData, 11);  // geoidHeightMeters(gps)
-     Serial.println(gpsData);
- //    logLine += gpsData;
- //    logLine += delim;
-
-     venus.getField(gpsData, 7);  // numSatsTracked(gps)
-     Serial.println(gpsData);
- //    logLine += gpsData;
- //    logLine += delim;
-
-     venus.getField(gpsData, 1);  // fixTime(gps)
-     Serial.println(gpsData);
-    logLine += gpsData;
-    logLine += delim;
+//    Serial.print(logLine);
+//    logLine = "";
+//    
+//     char gpsData[100] = "";
+//
+//     Serial.println();
+//
+//     venus.readLine();
+//     venus.getLine(gpsData);
+//
+//     Serial.println(venus.geLineSize());
+//     Serial.println(gpsData);
+//
+//
+//
+//     venus.getField(gpsData, 2);  // latitude(gps)
+//     Serial.println(gpsData);
+// //    logLine += gpsData;
+// //    logLine += delim;
+//
+//     venus.getField(gpsData, 5);  // longitude eastwest
+//     Serial.print(gpsData);
+// //    if(gpsData[0] == 'W') logLine += '-';
+//
+//     venus.getField(gpsData, 4);  // longitude(gps)
+//     Serial.println(gpsData);
+// //    logLine += gpsData;
+// //    logLine += delim;
+//
+//     venus.getField(gpsData, 9);  // altitudeMeters(gps)
+//     Serial.println(gpsData);
+// //    logLine += gpsData;
+// //    logLine += delim;
+//
+//     venus.getField(gpsData, 6);  // fixQuality(gps)
+//     Serial.println(gpsData);
+// //    logLine += gpsData;
+// //    logLine += delim;
+//
+//     venus.getField(gpsData, 8);  // posDilution(gps)
+//     Serial.println(gpsData);
+// //    logLine += gpsData;
+// //    logLine += delim;
+//
+//     venus.getField(gpsData, 11);  // geoidHeightMeters(gps)
+//     Serial.println(gpsData);
+// //    logLine += gpsData;
+// //    logLine += delim;
+//
+//     venus.getField(gpsData, 7);  // numSatsTracked(gps)
+//     Serial.println(gpsData);
+// //    logLine += gpsData;
+// //    logLine += delim;
+//
+//     venus.getField(gpsData, 1);  // fixTime(gps)
+//     Serial.println(gpsData);
+//    logLine += gpsData;
+//    logLine += delim;
     //end gps
 
 
