@@ -1,0 +1,47 @@
+#include <Adafruit_MPL3115A2.h>
+
+Adafruit_MPL3115A2 baro = Adafruit_MPL3115A2();
+
+
+float tempC;  
+float altm; 
+float pascals; 
+
+//The Arduino Map function but for floats
+//From: http://forum.arduino.cc/index.php?topic=3922.0
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+
+void setup() {
+Serial.begin(9600); //turn on serial monitor
+baro.begin();   //initialize pressure sensor mySensor
+
+
+}
+
+void loop() {
+float pascals = baro.getPressure();
+  // Our weather page presents pressure in Inches (Hg)
+  // Use http://www.onlineconversion.com/pressure.htm for other units
+
+
+  float altm = baro.getAltitude();
+
+
+  float tempC = baro.getTemperature();
+
+Serial.print("The Temp is: "); //Print Your results
+Serial.print(tempC);
+Serial.println(" degrees C");
+Serial.print("The Pressure is: ");
+Serial.print(pascals);
+Serial.println(" Pa.");
+Serial.print("The Altitude is: ");
+Serial.print(altm);
+Serial.print(" meters ");
+Serial.println("");
+delay(250); //Pause between readings.
+}
