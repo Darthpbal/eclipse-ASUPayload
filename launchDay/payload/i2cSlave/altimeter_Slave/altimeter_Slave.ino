@@ -30,9 +30,9 @@ void loop() {
   if(selState == on){
     digitalWrite(13, HIGH);
 
-    Serial.print(pascals/101325); Serial.print(" atm,\t");
-    Serial.print(altm); Serial.print(" meters,\t");
-    Serial.print( ( (tempC * 9) / 5) + 32 ); Serial.print(" *F ");
+    Serial.print(pascals); Serial.print(",");
+    Serial.print(altm); Serial.print(",");
+    Serial.print( tempC ); Serial.print(",");
     Serial.println();
 
     while(!digitalRead(8));

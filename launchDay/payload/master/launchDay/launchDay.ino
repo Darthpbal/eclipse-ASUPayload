@@ -58,13 +58,13 @@ Where:
 
 //determines how printing is handled for launch debug and graphing contexts
 enum configuration { launch, debug, plot };
-const configuration mode = launch;
+const configuration mode = debug;
 char delim;  //the seperator that will be printed to seperate all values.
 
 
-int altSelPin = 18;  // rx2
-int lightSelPin = 19; // rx3
-
+int altSelPin = 12;  // rx2
+int lightSelPin = 11; // rx3
+const bool on = LOW, off = HIGH;
 
 #include <Wire.h>               //I2C class
 #include <SPI.h>                //SPI class
@@ -229,8 +229,13 @@ void setup() {
     // end 9DOF
 
 
+    Serial2.begin(9600),
+    Serial3.begin(9600);
 
-
+    pinMode(altSelPin, OUTPUT);
+    pinMode(lightSelPin, OUTPUT);
+    digitalWrite(altSelPin, off);
+    digitalWrite(lightSelPin, off);
 
 
 
@@ -267,9 +272,9 @@ void setup() {
     header += "heading(9DOF),";
 
 
-//    header += "tempC(absPres),";
-//    header += "pascals(absPres),";
-//    header += "altitudeMeters(absPres),";
+   header += "tempC(absPres),";
+   header += "pascals(absPres),";
+   header += "altitudeMeters(absPres),";
 //
 //    header += "lum_lux(TSL2561),";
 //    header += "UVIndx_mW/cm^2(ML8511),";
@@ -437,6 +442,21 @@ void loop() {
 
 
 
+    // start altimeter
+    digitalWrite(altSelPin, on);
+    //  delay(200);
+    while(!Serial2.available()) ;//Serial.println("fuckingn shit");
+
+    logLine += Serial2.readStringUntil('\n');
+
+    digitalWrite(altSelPin, off);
+    // end altimeter
+
+
+
+
+    // start light sensors
+    // end light sensors
 
 
 
