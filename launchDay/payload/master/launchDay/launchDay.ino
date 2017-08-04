@@ -58,11 +58,12 @@ Where:
 
 //determines how printing is handled for launch debug and graphing contexts
 enum configuration { launch, debug, plot };
-const configuration mode = debug;
+const configuration mode = launch;
 char delim;  //the seperator that will be printed to seperate all values.
 
 
-
+int altSelPin = 18;  // rx2
+int lightSelPin = 19; // rx3
 
 
 #include <Wire.h>               //I2C class
@@ -243,20 +244,14 @@ void setup() {
     */
     String header = ""; //create header variable
 
-//    header += "pascals(absPres),";
-//    header += "atmospheres(absPres),";
-//    header += "altitudeMeters(absPres),";
-//    header += "tempC(absPres),";
 
     header += "humidity%(dht22),";
     header += "tempF(dht22),";
     header += "heatIndxF(dht22),";
 
-    // header += "visible(adaUV),";
-    // header += "IR(adaUV),";
-    // header += "UVIndx(adaUV),";
 
     header += "tempF(thermocouple),";
+
 
     header += "accelXG(9DOF),";
     header += "accelYG(9DOF),";
@@ -271,15 +266,18 @@ void setup() {
     header += "pitch(9DOF),";
     header += "heading(9DOF),";
 
-     header += "latitude(gps),";
-     header += "longitude(gps),";
-     header += "altitudeMeters(gps),";
-     header += "fixQuality(gps),";
-     header += "posDilution(gps),";
-     header += "geoidHeightMeters(gps),";
-     header += "numSatsTracked(gps),";
-     header += "fixTime(gps),";
 
+//    header += "tempC(absPres),";
+//    header += "pascals(absPres),";
+//    header += "altitudeMeters(absPres),";
+//
+//    header += "lum_lux(TSL2561),";
+//    header += "UVIndx_mW/cm^2(ML8511),";
+
+
+    header += "internalTempC(tmp36),";
+
+    header += "battLvl,";
 
     header += "millis\n";
 
@@ -322,25 +320,6 @@ void loop() {
 
 
     String logLine = "";        //create a sentence string for logging
-
-
-
-
-
-
-
-
-
-
-
-
-    //altimeter
-    // use link to arduino uno dedicated to altimeter to fetch most recent altitude/temp/etc
-    //end altimeter
-
-
-
-
 
 
     //start dht22
@@ -460,12 +439,14 @@ void loop() {
 
 
 
+
+
     //start gps
     // check the GPS field explaination
     // to see the field numbers
 //    Serial.print(logLine);
 //    logLine = "";
-//    
+//
 //     char gpsData[100] = "";
 //
 //     Serial.println();
@@ -524,6 +505,12 @@ void loop() {
     //end gps
 
 
+    logLine += analogRead(A0) * 5.0 / 1023 * 1000 / 10; //internal temp
+    logLine += delim;
+
+    logLine += analogRead(A3) * 5.0 / 1023; //batt level
+    logLine += delim;
+
 
     if(mode != plot){
         logLine += millis();    // timestamp
@@ -537,10 +524,10 @@ void loop() {
     else if(mode == plot) Serial.print(logLine);
     else if(mode == launch) lineLogger(logLine);
 
-    
 
-    Serial.println('\n');
-    delay(3000);     //for sanity
+
+//    Serial.println('\n');
+    if(mode == debug) delay(3000);     //for sanity
 }// end of loop
 
 ////////////////////////////////////////////////////////////////////////////////
