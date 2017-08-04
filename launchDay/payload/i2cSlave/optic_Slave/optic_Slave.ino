@@ -12,11 +12,13 @@ SFE_TSL2561 light;
 
 boolean gain;     // Gain setting, 0 = X1, 1 = X16;
 unsigned int ms;  // Integration ("shutter") time in milliseconds
-
+int UVOUT = A0; //Output from the sensor
+int REF_3V3 = A1;
 void setup()
 {
   // Initialize the Serial port:
-
+  pinMode(UVOUT, INPUT);
+  pinMode(REF_3V3, INPUT);
   Serial.begin(9600);
   pinMode(8, INPUT);
   pinMode(13, OUTPUT);
@@ -28,20 +30,7 @@ void setup()
 
   unsigned char ID;
 
-  if (light.getID(ID))
-  {
-    Serial.print("Got factory ID: 0X");
-    Serial.print(ID,HEX);
-    Serial.println(", should be 0X5X");
-  }
-  // Most library commands will return true if communications was successful,
-  // and false if there was a problem. You can ignore this returned value,
-  // or check whether a command worked correctly and retrieve an error code:
-  else
-  {
-    byte error = light.getError();
-    printError(error);
-  }
+//  if (ligh/
 
   // The light sensor has a default integration time of 402ms,
   // and a default gain of low (1X).
@@ -102,7 +91,11 @@ void loop()
   // Retrieve the data from the device:
 
 
-
+int uvLevel = averageAnalogRead(UVOUT);
+int refLevel = averageAnalogRead(REF_3V3);
+//Use the 3.3V power pin as a reference to get a very accurate output value from sensor
+float outputVoltage = 3.3 / refLevel * uvLevel;
+float uvIntensity = mapfloat(outputVoltage, 0.99, 2.9, 0.0, 15.0);
 
 if(millis() - tim > ms){
   readCheck = light.getData(data0,data1);
@@ -110,33 +103,39 @@ if(millis() - tim > ms){
 }
 
 
-  bool selState = digitalRead(8);
-  if(selState == on){
-    digitalWrite(13, HIGH);
+bool selState = digitalRead(8);
+if(selState == on){
+digitalWrite(13, HIGH);
 
 
   if (readCheck)
   {
 
-    Serial.print("data0: ");
     Serial.print(data0);
-    Serial.print(" data1: ");
+    Serial.print(",");
     Serial.print(data1);
+    Serial.print(",");
 
     double lux;    // Resulting lux value
     boolean good;  // True if neither sensor is saturated
 
     good = light.getLux(gain,ms,data0,data1,lux);
 
-    Serial.print(" lux: ");
     Serial.print(lux);
-    if (good) Serial.println(" (good)"); else Serial.println(" (BAD)");
+    Serial.print(",");
+    if (good) Serial.print("good,"); else Serial.print("BAD,");
   }
   else
   {
     byte error = light.getError();
     printError(error);
   }
+
+
+  Serial.print(uvIntensity);
+  Serial.print(",");
+
+  Serial.print('\n');
 
 
     while(!digitalRead(8));
@@ -183,13 +182,21 @@ void printError(byte error)
 
 
 
+int averageAnalogRead(int pinToRead)
+{
+  byte numberOfReadings = 8;
+  unsigned int runningValue = 0;
 
-/*
+  for(int x = 0 ; x < numberOfReadings ; x++)
+    runningValue += analogRead(pinToRead);
+  runningValue /= numberOfReadings;
 
+  return(runningValue);
+}
 
-
-
-
-
-
-*/
+//The Arduino Map function but for floats
+//From: http://forum.arduino.cc/index.php?topic=3922.0
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}

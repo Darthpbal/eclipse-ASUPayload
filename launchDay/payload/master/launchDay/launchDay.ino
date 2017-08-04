@@ -272,12 +272,15 @@ void setup() {
     header += "heading(9DOF),";
 
 
+    header += "pascals(absPres),";
+    header += "altitudeMeters(absPres),";
    header += "tempC(absPres),";
-   header += "pascals(absPres),";
-   header += "altitudeMeters(absPres),";
 //
-//    header += "lum_lux(TSL2561),";
-//    header += "UVIndx_mW/cm^2(ML8511),";
+   header += "visibleChanlRaw(TSL2561),";
+   header += "irChanlRaw(TSL2561),";
+   header += "lum_lux(TSL2561),";
+   header += "saturated?(TSL2561),";
+   header += "UVIndx_mW/cm^2(ML8511),";
 
 
     header += "internalTempC(tmp36),";
@@ -456,6 +459,13 @@ void loop() {
 
 
     // start light sensors
+    digitalWrite(lightSelPin, on);
+    //  delay(200);
+    while(!Serial3.available()) ;//Serial.println("fuckingn shit");
+
+    logLine += Serial3.readStringUntil('\n');
+
+    digitalWrite(lightSelPin, off);
     // end light sensors
 
 

@@ -33,7 +33,7 @@ void loop() {
     Serial.print(pascals); Serial.print(",");
     Serial.print(altm); Serial.print(",");
     Serial.print( tempC ); Serial.print(",");
-    Serial.println();
+    Serial.print('\n');
 
     while(!digitalRead(8));
 
