@@ -54,7 +54,7 @@ void Mercury::begin(int baud){
 
 
 void Mercury::readRawLine(){
-  Serial.print("raw\t");
+  // Serial.print("raw\t");
     charPos = 0;
     memset(sentence, '\0', sentenceSize);
     while( readChar != '$' ) readChar = serialPort->read();
@@ -81,12 +81,13 @@ int Mercury::geLineSize(){
 
 
 void Mercury::readFilteredLine(){
-    Serial.print("filter\t");
+    // Serial.print("filter\t");
     tagDetected = false;
     do{
         readRawLine();
 
-        if((strstr(sentence, gpsTag) != NULL)) tagDetected = true;
+        // if((strstr(sentence, gpsTag) != NULL)) tagDetected = true;
+        if( (sentence[3] == gpsTag[2]) && (sentence[4] == gpsTag[3]) && (sentence[5] == gpsTag[4]) ) tagDetected = true;
         else {
           tagDetected = false;
           memset(sentence, '\0', sentenceSize);
