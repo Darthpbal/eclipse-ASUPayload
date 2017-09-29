@@ -65,6 +65,7 @@ char delim;  //the seperator that will be printed to seperate all values.
 int altSelPin = 12;  // rx2
 int lightSelPin = 11; // rx3
 const bool on = LOW, off = HIGH;
+unsigned long selTime = 0;
 
 #include <Wire.h>               //I2C class
 #include <SPI.h>                //SPI class
@@ -291,7 +292,8 @@ void setup() {
     header += "numSatsTracked(gps),";
     header += "fixTime(gps),";
 
-    header += "internalTempC(tmp36),";
+    header += "internalControllerTempC(tmp36),";
+    header += "internalCameraTempC(tmp36),";
 
     header += "battLvl,";
 
@@ -454,11 +456,13 @@ void loop() {
 
 
     // start altimeter
+    selTime = millis();
     digitalWrite(altSelPin, on);
     //  delay(200);
-    while(!Serial2.available()) ;//Serial.println("fuckingn shit");
+    while(!Serial2.available() && (millis() - selTime < 3000)) ;
 
-    logLine += Serial2.readStringUntil('\n');
+    if(millis() - selTime < 3000) logLine += Serial2.readStringUntil('\n');
+    else logLine += "fault,fault,fault,";
 
     digitalWrite(altSelPin, off);
     // end altimeter
@@ -467,11 +471,13 @@ void loop() {
 
 
     // start light sensors
+    selTime = millis();
     digitalWrite(lightSelPin, on);
     //  delay(200);
-    while(!Serial3.available()) ;//Serial.println("fuckingn shit");
+    while(!Serial3.available() && (millis() - selTime < 3000)) ;
 
-    logLine += Serial3.readStringUntil('\n');
+    if(millis() - selTime < 3000) logLine += Serial3.readStringUntil('\n');
+    else logLine += "fault,fault,fault,fault,fault,";
 
     digitalWrite(lightSelPin, off);
     // end light sensors
@@ -552,6 +558,9 @@ void loop() {
     logLine += analogRead(A0) * 5.0 / 1023 * 1000 / 10; //internal temp
     logLine += delim;
 
+    logLine += analogRead(A2) * 5.0 / 1023 * 1000 / 10; //internal temp
+    logLine += delim;
+
     logLine += analogRead(A3) * 5.0 / 1023; //batt level
     logLine += delim;
 
@@ -573,7 +582,7 @@ void loop() {
 //    Serial.println('\n');
     if(mode == debug){
         Serial.println();
-        delay(10 * 1000);     //for sanity
+//        delay(1 * 1000)/;     //for sanity
     }
 }// end of loop
 
